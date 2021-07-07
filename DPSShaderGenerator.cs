@@ -21,6 +21,672 @@ namespace DPSGen
         public const string ASSETS_GENERATE_WF = BASE_PATH_ASSETS + "Generate UnlitWF Shaders";
     }
 
+    public class WFGenWindow : EditorWindow
+    {
+        [MenuItem(MenuStrings.TOOLS_GENERATE_WF)]
+        [MenuItem(MenuStrings.TOOLS_GENERATE_WF)]
+        private static void OpenWindowFromMenu()
+        {
+            GetWindow<WFGenWindow>("DPS Shader Generator/Generate UnlitWF Shaders");
+        }
+
+        Vector2 scroll = Vector2.zero;
+        string log = "";
+
+        private void OnEnable()
+        {
+            minSize = new Vector2(480, 640);
+        }
+
+        private void OnGUI()
+        {
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("DPS Shader Generator/Generate UnlitWF Shaders");
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+
+            EditorGUILayout.LabelField("Generate DPS UnlitWF Shaders");
+            EditorGUILayout.HelpBox("You need to import DPS and UnlitWF before running this script.", MessageType.Info);
+            EditorGUILayout.Space();
+
+            if (GUILayout.Button("Generate"))
+            {
+                RunWFGen();
+            }
+
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+            EditorGUILayout.Space();
+            scroll = EditorGUILayout.BeginScrollView(scroll, GUILayout.Height(420));
+            log = EditorGUILayout.TextArea(log, GUILayout.ExpandHeight(true));
+            EditorGUILayout.EndScrollView();
+        }
+
+        private void RunWFGen()
+        {
+            log = "";
+            string pathOpaque = null;
+            string pathOpaqueOutline = null;
+            string pathOutlineOnly = null;
+            string pathXSOrifice = null;
+            string pathXSPenetrator = null;
+            string[] guids1 = AssetDatabase.FindAssets("t:Shader");
+            foreach (string guid in guids1)
+            {
+                string sp = AssetDatabase.GUIDToAssetPath(guid);
+                if (pathOpaque == null && sp.EndsWith("/Unlit_WF_UnToon_Opaque.shader"))
+                {
+                    pathOpaque = sp;
+                    log += "Opaque: " + sp + "\n";
+                }
+                if (pathOpaqueOutline == null && sp.EndsWith("/Unlit_WF_UnToon_Outline_Opaque.shader"))
+                {
+                    pathOpaqueOutline = sp;
+                    log += "OpaqueOutline: " + sp + "\n";
+                }
+                if (pathOutlineOnly == null && sp.EndsWith("/Unlit_WF_UnToon_OutlineOnly_Opaque.shader"))
+                {
+                    pathOutlineOnly = sp;
+                    log += "OutlineOnly: " + sp + "\n";
+                }
+
+                if (pathXSOrifice == null && sp.EndsWith("/XSToon2.0 Orifice.shader"))
+                {
+                    pathXSOrifice = sp;
+                    log += "XSOrifice: " + sp + "\n";
+                }
+                if (pathXSPenetrator == null && sp.EndsWith("/XSToon2.0 Penetrator.shader"))
+                {
+                    pathXSPenetrator = sp;
+                    log += "XSPenetrator: " + sp + "\n";
+                }
+            }
+
+            if (pathOpaque == null || pathOpaqueOutline == null || pathOutlineOnly == null)
+            {
+                log += "Error: UnlitWF not found. Please import UnlitWF.";
+                return;
+            }
+            if (pathXSOrifice == null || pathXSPenetrator == null)
+            {
+                log += "Error: DPS not found. Please import DPS.";
+                return;
+            }
+
+            string wfDirPath = Path.GetDirectoryName(pathOpaque);
+            string path_inc_meta = null;
+            string path_inc_untoon = null;
+            string path_inc_input = null;
+            string path_inc_func = null;
+            string path_inc_uniform = null;
+            string path_inc_sc = null;
+            string path_inc_com = null;
+            string path_inc_comL = null;
+            string path_inc_comB = null;
+            log += "WFDirectory: " + wfDirPath + "\n";
+            string[] guids2 = AssetDatabase.FindAssets("WF_", new string[] { wfDirPath });
+            foreach (string guid in guids2)
+            {
+                string sp = AssetDatabase.GUIDToAssetPath(guid);
+                if (path_inc_untoon == null && sp.EndsWith("/WF_UnToon.cginc"))
+                {
+                    path_inc_untoon = sp;
+                    log += "inc_untoon: " + sp + "\n";
+                }
+                if (path_inc_meta == null && sp.EndsWith("/WF_UnToon_Meta.cginc"))
+                {
+                    path_inc_meta = sp;
+                    log += "inc_meta: " + sp + "\n";
+                }
+                if (path_inc_sc == null && sp.EndsWith("/WF_UnToon_ShadowCaster.cginc"))
+                {
+                    path_inc_sc = sp;
+                    log += "inc_sc: " + sp + "\n";
+                }
+                if (path_inc_input == null && sp.EndsWith("/WF_INPUT_UnToon.cginc"))
+                {
+                    path_inc_input = sp;
+                    log += "inc_input: " + sp + "\n";
+                }
+                if (path_inc_func == null && sp.EndsWith("/WF_UnToon_Function.cginc"))
+                {
+                    path_inc_func = sp;
+                    log += "inc_func: " + sp + "\n";
+                }
+                if (path_inc_uniform == null && sp.EndsWith("/WF_UnToon_Uniform.cginc"))
+                {
+                    path_inc_uniform = sp;
+                    log += "inc_uniform: " + sp + "\n";
+                }
+                if (path_inc_com == null && sp.EndsWith("/WF_Common.cginc"))
+                {
+                    path_inc_com = sp;
+                    log += "inc_common: " + sp + "\n";
+                }
+                if (path_inc_comL == null && sp.EndsWith("/WF_Common_LightweightRP.cginc"))
+                {
+                    path_inc_comL = sp;
+                    log += "inc_commonL: " + sp + "\n";
+                }
+                if (path_inc_comB == null && sp.EndsWith("/WF_Common_BuiltinRP.cginc"))
+                {
+                    path_inc_comB = sp;
+                    log += "inc_commonB: " + sp + "\n";
+                }
+            }
+
+            string[] guids_sc = AssetDatabase.FindAssets("WF_ShaderCustomEditor t:Script");
+            string path_customEditor = null;
+            foreach (string guid in guids_sc)
+            {
+                string sp = AssetDatabase.GUIDToAssetPath(guid);
+                if (sp.EndsWith("/WF_ShaderCustomEditor.cs"))
+                {
+                    path_customEditor = sp;
+                    log += "CustomEditor: " + sp + "\n";
+                    break;
+                }
+            }
+
+            string dpsCGincDirPath = Directory.GetParent(Path.GetDirectoryName(pathXSOrifice)) + "/CGInc";
+            string path_xs_OD = null;
+            string path_xs_PD = null;
+            string path_xs_OVD = null;
+            string path_xs_VO = null;
+            string path_xs_VP = null;
+            log += "DPS_XS_CGInc_Directory: " + dpsCGincDirPath + "\n";
+            string[] guids3 = AssetDatabase.FindAssets("", new string[] { dpsCGincDirPath });
+            foreach (string guid in guids3)
+            {
+                string sp = AssetDatabase.GUIDToAssetPath(guid);
+                if (path_xs_OD == null && sp.EndsWith("/OrificeDefines.cginc"))
+                {
+                    path_xs_OD = sp;
+                    log += "OrificeDefines: " + sp + "\n";
+                }
+                if (path_xs_PD == null && sp.EndsWith("/PenetratorDefines.cginc"))
+                {
+                    path_xs_PD = sp;
+                    log += "PenetratorDefines: " + sp + "\n";
+                }
+                if (path_xs_OVD == null && sp.EndsWith("/XSDefinesOrifice.cginc"))
+                {
+                    path_xs_OVD = sp;
+                    log += "DefinesOrificeVertexData: " + sp + "\n";
+                }
+                if (path_xs_VO == null && sp.EndsWith("/XSVertOrifice.cginc"))
+                {
+                    path_xs_VO = sp;
+                    log += "DPSFunctions: " + sp + "\n";
+                }
+                if (path_xs_VP == null && sp.EndsWith("/XSVert.cginc"))
+                {
+                    path_xs_VP = sp;
+                    log += "XSPenetratorVert: " + sp + "\n";
+                }
+            }
+
+            log += "\n";
+            string[] selfguids = AssetDatabase.FindAssets("DPSShaderGenerator t:script");
+            if (selfguids.Length == 0)
+            {
+                log += "Error: Could not find this script from the asset database. Did you rename this script?";
+                return;
+            }
+            string selfpath = AssetDatabase.GUIDToAssetPath(selfguids[0]);
+            string outputPath = Directory.GetParent(Path.GetDirectoryName(selfpath)) + "/ShaderWF";
+            log += "OutputPath: " + outputPath + "\n";
+            Directory.CreateDirectory(outputPath);
+
+            List<string> newAssets = new List<string>();
+
+            AssetDatabase.DeleteAsset(outputPath + "/WF_Common.cginc");
+            AssetDatabase.CopyAsset(path_inc_com, outputPath + "/WF_Common.cginc");
+
+            AssetDatabase.DeleteAsset(outputPath + "/WF_Common_LightweightRP.cginc");
+            AssetDatabase.CopyAsset(path_inc_comL, outputPath + "/WF_Common_LightweightRP.cginc");
+
+            AssetDatabase.DeleteAsset(outputPath + "/WF_Common_BuiltinRP.cginc");
+            AssetDatabase.CopyAsset(path_inc_comB, outputPath + "/WF_Common_BuiltinRP.cginc");
+
+            AssetDatabase.DeleteAsset(outputPath + "/WF_INPUT_UnToon.cginc");
+            AssetDatabase.CopyAsset(path_inc_input, outputPath + "/WF_INPUT_UnToon.cginc");
+
+            AssetDatabase.DeleteAsset(outputPath + "/WF_UnToon_Function.cginc");
+            AssetDatabase.CopyAsset(path_inc_func, outputPath + "/WF_UnToon_Function.cginc");
+
+            AssetDatabase.DeleteAsset(outputPath + "/WF_UnToon_Uniform.cginc");
+            AssetDatabase.CopyAsset(path_inc_uniform, outputPath + "/WF_UnToon_Uniform.cginc");
+
+            AssetDatabase.DeleteAsset(outputPath + "/OrificeDefines.cginc");
+            AssetDatabase.CopyAsset(path_xs_OD, outputPath + "/OrificeDefines.cginc");
+
+            AssetDatabase.DeleteAsset(outputPath + "/PenetratorDefines.cginc");
+            AssetDatabase.CopyAsset(path_xs_PD, outputPath + "/PenetratorDefines.cginc");
+
+            if (path_inc_untoon != null)
+            {
+                string opath = outputPath + "/WF_UnToon_Orifice.cginc";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(path_inc_untoon);
+                string[] xslines = File.ReadAllLines(path_xs_VO);
+                string[] ovdlines = File.ReadAllLines(path_xs_OVD);
+                lines[38] = "";
+                lines[40] = ovdlines[13];
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i == 25)
+                        writer.WriteLine("#include \"OrificeDefines.cginc\"");
+                    if (i == 72)
+                        writer.WriteLine("#include \"OrificeFunctions.cginc\"");
+                    if (i == 78 || i == 203)
+                    {
+                        // Orifice vert
+                        for (int j = 54; j <= 81; j++)
+                            writer.WriteLine(xslines[j]);
+                    }
+                    writer.WriteLine(lines[i]);
+                }
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+            if (path_inc_untoon != null)
+            {
+                string opath = outputPath + "/WF_UnToon_Penetrator.cginc";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(path_inc_untoon);
+                string[] xslines = File.ReadAllLines(path_xs_VP);
+                lines[38] = "";
+                lines[40] = "";
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i == 25)
+                        writer.WriteLine("#include \"PenetratorDefines.cginc\"");
+                    if (i == 72)
+                        writer.WriteLine("#include \"PenetratorFunctions.cginc\"");
+                    if (i == 78 || i == 203)
+                    {
+                        // Penetrator vert
+                        for (int j = 43; j <= 106; j++)
+                            writer.WriteLine(xslines[j]);
+                    }
+                    writer.WriteLine(lines[i]);
+                }
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+
+            if (path_inc_meta != null)
+            {
+                string opath = outputPath + "/WF_UnToon_Meta_Orifice.cginc";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(path_inc_meta);
+                string[] xslines = File.ReadAllLines(path_xs_VO);
+                string[] ovdlines = File.ReadAllLines(path_xs_OVD);
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i == 25)
+                        writer.WriteLine("#include \"OrificeDefines.cginc\"");
+                    if (i == 57)
+                        writer.WriteLine("#include \"OrificeFunctions.cginc\"");
+                    if (i == 38)
+                    {
+                        //add normal, tangent and vertexId
+                        writer.WriteLine(ovdlines[10]);
+                        writer.WriteLine(ovdlines[11]);
+                        writer.WriteLine(ovdlines[13]);
+                    }
+                    if (i == 63)
+                    {
+                        // Orifice vert
+                        for (int j = 54; j <= 81; j++)
+                            writer.WriteLine(xslines[j]);
+                    }
+                    writer.WriteLine(lines[i]);
+                }
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+            if (path_inc_meta != null)
+            {
+                string opath = outputPath + "/WF_UnToon_Meta_Penetrator.cginc";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(path_inc_meta);
+                string[] xslines = File.ReadAllLines(path_xs_VP);
+                string[] ovdlines = File.ReadAllLines(path_xs_OVD);
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i == 25)
+                        writer.WriteLine("#include \"PenetratorDefines.cginc\"");
+                    if (i == 57)
+                        writer.WriteLine("#include \"PenetratorFunctions.cginc\"");
+                    if (i == 38)
+                    {
+                        //add normal and tangent
+                        writer.WriteLine(ovdlines[10]);
+                        writer.WriteLine(ovdlines[11]);
+                    }
+                    if (i == 63)
+                    {
+                        // Penetrator vert
+                        for (int j = 43; j <= 106; j++)
+                            writer.WriteLine(xslines[j]);
+                    }
+                    writer.WriteLine(lines[i]);
+                }
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+
+            if (path_inc_sc != null)
+            {
+                string opath = outputPath + "/WF_UnToon_ShadowCaster_Orifice.cginc";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(path_inc_sc);
+                string[] xslines = File.ReadAllLines(path_xs_VO);
+                string[] ovdlines = File.ReadAllLines(path_xs_OVD);
+                lines[47] = "v2f_shadow vert_shadow(appdata v) {";
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i == 25)
+                        writer.WriteLine("#include \"OrificeDefines.cginc\"");
+                    if (i == 42)
+                        writer.WriteLine("#include \"OrificeFunctions.cginc\"");
+                    if (i == 29)
+                    {
+                        //add vert structure
+                        writer.WriteLine("struct appdata {");
+                        writer.WriteLine("float4 vertex : POSITION;");
+                        writer.WriteLine("float4 texcoord : TEXCOORD0;");
+                        writer.WriteLine(ovdlines[10]);
+                        writer.WriteLine(ovdlines[11]);
+                        writer.WriteLine(ovdlines[13]);
+                        writer.WriteLine("};");
+                    }
+                    if (i == 48)
+                    {
+                        // Orifice vert
+                        for (int j = 54; j <= 81; j++)
+                            writer.WriteLine(xslines[j]);
+                    }
+                    writer.WriteLine(lines[i]);
+                }
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+            if (path_inc_sc != null)
+            {
+                string opath = outputPath + "/WF_UnToon_ShadowCaster_Penetrator.cginc";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(path_inc_sc);
+                string[] xslines = File.ReadAllLines(path_xs_VP);
+                string[] ovdlines = File.ReadAllLines(path_xs_OVD);
+                lines[47] = "v2f_shadow vert_shadow(appdata v) {"; 
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i == 25)
+                        writer.WriteLine("#include \"PenetratorDefines.cginc\"");
+                    if (i == 42)
+                        writer.WriteLine("#include \"PenetratorFunctions.cginc\"");
+                    if (i == 29)
+                    {
+                        //add vert structure
+                        writer.WriteLine("struct appdata {");
+                        writer.WriteLine("float4 vertex : POSITION;");
+                        writer.WriteLine("float4 texcoord : TEXCOORD0;");
+                        writer.WriteLine(ovdlines[10]);
+                        writer.WriteLine(ovdlines[11]);
+                        writer.WriteLine(ovdlines[13]);
+                        writer.WriteLine("};");
+                    }
+                    if (i == 48)
+                    {
+                        // Penetrator vert
+                        for (int j = 43; j <= 106; j++)
+                            writer.WriteLine(xslines[j]);
+                    }
+                    writer.WriteLine(lines[i]);
+                }
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+
+            if (path_xs_VO != null)
+            {
+                string opath = outputPath + "/OrificeFunctions.cginc";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(path_xs_VO);
+                for (int i = 0; i < 51; i++)
+                    writer.WriteLine(lines[i]);
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+            if (path_xs_VO != null)
+            {
+                string opath = outputPath + "/PenetratorFunctions.cginc";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(path_xs_VO);
+                for (int i = 0; i < 41; i++)
+                    writer.WriteLine(lines[i]);
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+
+            if (pathOpaque != null)
+            {
+                string opath = outputPath + "/Unlit_WF_UnToon_Opaque_Orifice.shader";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(pathOpaque);
+                string[] xslines = File.ReadAllLines(pathXSOrifice);
+                lines[16] = "Shader \"UnlitWF/DPS/WF_UnToon_Opaque_Orifice\" {";
+                lines[321] = "#include \"WF_UnToon_Orifice.cginc\"";
+                lines[340] = "#include \"WF_UnToon_ShadowCaster_Orifice.cginc\"";
+                lines[360] = "#include \"WF_UnToon_Meta_Orifice.cginc\"";
+                lines[368] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i == 29)
+                    {
+                        // Orifice Properties
+                        writer.WriteLine("[WFHeader(Orifice Dynamic Penetration System)]");
+                        for (int j = 12; j <= 23; j++)
+                            writer.WriteLine(xslines[j]);
+                    }
+                    writer.WriteLine(lines[i]);
+                }
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+            if (pathOpaque != null)
+            {
+                string opath = outputPath + "/Unlit_WF_UnToon_Opaque_Penetrator.shader";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(pathOpaque);
+                string[] xslines = File.ReadAllLines(pathXSPenetrator);
+                lines[16] = "Shader \"UnlitWF/DPS/WF_UnToon_Opaque_Penetrator\" {";
+                lines[321] = "#include \"WF_UnToon_Penetrator.cginc\"";
+                lines[340] = "#include \"WF_UnToon_ShadowCaster_Penetrator.cginc\"";
+                lines[360] = "#include \"WF_UnToon_Meta_Penetrator.cginc\"";
+                lines[368] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i == 29)
+                    {
+                        // Penetrator Properties
+                        writer.WriteLine("[WFHeader(Orifice Dynamic Penetration System)]");
+                        for (int j = 11; j <= 23; j++)
+                            writer.WriteLine(xslines[j]);
+                    }
+                    writer.WriteLine(lines[i]);
+                }
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+
+            if (pathOpaqueOutline != null)
+            {
+                string opath = outputPath + "/Unlit_WF_UnToon_Outline_Opaque_Orifice.shader";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(pathOpaqueOutline);
+                string[] xslines = File.ReadAllLines(pathXSOrifice);
+                lines[16] = "Shader \"UnlitWF/DPS/WF_UnToon_Outline_Opaque_Orifice\" {";
+                lines[320] = "UsePass \"UnlitWF/DPS/WF_UnToon_OutlineOnly_Opaque_Orifice/OUTLINE\"";
+                lines[354] = "#include \"WF_UnToon_Orifice.cginc\"";
+                lines[359] = "UsePass \"UnlitWF/DPS/WF_UnToon_Opaque_Orifice/SHADOWCASTER\"";
+                lines[360] = "UsePass \"UnlitWF/DPS/WF_UnToon_Opaque_Orifice/META\"";
+                lines[365] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i == 29)
+                    {
+                        // Orifice Properties
+                        writer.WriteLine("[WFHeader(Orifice Dynamic Penetration System)]");
+                        for (int j = 12; j <= 23; j++)
+                            writer.WriteLine(xslines[j]);
+                    }
+                    writer.WriteLine(lines[i]);
+                }
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+            if (pathOpaqueOutline != null)
+            {
+                string opath = outputPath + "/Unlit_WF_UnToon_Outline_Opaque_Penetrator.shader";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(pathOpaqueOutline);
+                string[] xslines = File.ReadAllLines(pathXSPenetrator);
+                lines[16] = "Shader \"UnlitWF/DPS/WF_UnToon_Outline_Opaque_Penetrator\" {";
+                lines[320] = "UsePass \"UnlitWF/DPS/WF_UnToon_OutlineOnly_Opaque_Penetrator/OUTLINE\"";
+                lines[354] = "#include \"WF_UnToon_Penetrator.cginc\"";
+                lines[359] = "UsePass \"UnlitWF/DPS/WF_UnToon_Opaque_Penetrator/SHADOWCASTER\"";
+                lines[360] = "UsePass \"UnlitWF/DPS/WF_UnToon_Opaque_Penetrator/META\"";
+                lines[365] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i == 29)
+                    {
+                        // Penetrator Properties
+                        writer.WriteLine("[WFHeader(Orifice Dynamic Penetration System)]");
+                        for (int j = 11; j <= 23; j++)
+                            writer.WriteLine(xslines[j]);
+                    }
+                    writer.WriteLine(lines[i]);
+                }
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+
+            if (pathOutlineOnly != null)
+            {
+                string opath = outputPath + "/WF_UnToon_OutlineOnly_Opaque_Orifice.shader";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(pathOutlineOnly);
+                string[] xslines = File.ReadAllLines(pathXSOrifice);
+                lines[16] = "Shader \"UnlitWF/DPS/WF_UnToon_OutlineOnly_Opaque_Orifice\" {";
+                lines[96] = "#pragma vertex vert_outline";
+                lines[97] = "";
+                lines[101] = "";
+                lines[111] = "#include \"WF_UnToon_Orifice.cginc\"";
+                lines[121] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i == 27)
+                    {
+                        // Orifice Properties
+                        writer.WriteLine("[WFHeader(Orifice Dynamic Penetration System)]");
+                        for (int j = 12; j <= 23; j++)
+                            writer.WriteLine(xslines[j]);
+                    }
+                    writer.WriteLine(lines[i]);
+                }
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+            if (pathOutlineOnly != null)
+            {
+                string opath = outputPath + "/WF_UnToon_OutlineOnly_Opaque_Penetrator.shader";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(pathOutlineOnly);
+                string[] xslines = File.ReadAllLines(pathXSPenetrator);
+                lines[16] = "Shader \"UnlitWF/DPS/WF_UnToon_OutlineOnly_Opaque_Penetrator\" {";
+                lines[96] = "#pragma vertex vert_outline";
+                lines[97] = "";
+                lines[101] = "";
+                lines[111] = "#include \"WF_UnToon_Penetrator.cginc\"";
+                lines[121] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i == 27)
+                    {
+                        // Penetrator Properties
+                        writer.WriteLine("[WFHeader(Orifice Dynamic Penetration System)]");
+                        for (int j = 11; j <= 23; j++)
+                            writer.WriteLine(xslines[j]);
+                    }
+                    writer.WriteLine(lines[i]);
+                }
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+
+            if (path_customEditor != null)
+            {
+                string opath = Directory.GetParent(Path.GetDirectoryName(selfpath)) + "/Editor" + "/WF_ShaderCustomEditorDPS.cs";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(path_customEditor);
+                lines[28] = "public class ShaderCustomEditorDPS : ShaderGUI";
+                lines[222] = "";
+                for (int i = 0; i < 960; i++)
+                {
+                    writer.WriteLine(lines[i]);
+                }
+                writer.WriteLine("}");
+                writer.WriteLine("#endif");
+                writer.Flush();
+                writer.Close();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+
+            log += "Done.\n";
+        }
+    }
+
     public class UTSGenWindow : EditorWindow
     {
         [MenuItem(MenuStrings.TOOLS_GENERATE_UTS)]
@@ -30,8 +696,6 @@ namespace DPSGen
             GetWindow<UTSGenWindow>("DPS Shader Generator/Generate UTS");
         }
 
-        private GUIStyle styleTitle;
-        private GUIStyle styleBigText;
         Vector2 scroll = Vector2.zero;
         string log = "";
 
@@ -53,7 +717,7 @@ namespace DPSGen
 
             if (GUILayout.Button("Generate"))
             {
-                Run();
+                RunUTSGen();
             }
 
             EditorGUILayout.Space();
@@ -64,7 +728,7 @@ namespace DPSGen
             EditorGUILayout.EndScrollView();
         }
 
-        private void Run()
+        private void RunUTSGen()
         {
             log = "";
             string pathToonDSF = null;
@@ -199,7 +863,7 @@ namespace DPSGen
                 return;
             }
             string selfpath = AssetDatabase.GUIDToAssetPath(selfguids[0]);
-            string outputPath = Directory.GetParent(Path.GetDirectoryName(selfpath)) + "/Shader";
+            string outputPath = Directory.GetParent(Path.GetDirectoryName(selfpath)) + "/ShaderUTS";
             log += "OutputPath: " + outputPath + "\n";
             Directory.CreateDirectory(outputPath);
 
@@ -448,14 +1112,13 @@ namespace DPSGen
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(pathToonDSF);
                 string[] xslines = File.ReadAllLines(pathXSOrifice);
+                lines[5] = "Shader \"UnityChanToonShader/DPS/Toon_DoubleShadeWithFeather_Orifice\" {";
+                lines[174] = "#include \"UCTS_Outline_Orifice.cginc\"";
+                lines[205] = "#include \"UCTS_DoubleShadeWithFeather_Orifice.cginc\"";
+                lines[235] = "#include \"UCTS_DoubleShadeWithFeather_Orifice.cginc\"";
+                lines[260] = "#include \"UCTS_ShadowCaster_Orifice.cginc\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (i == 5)
-                    {
-                        writer.WriteLine("Shader \"UnityChanToonShader/DPS/Toon_DoubleShadeWithFeather_Orifice\" {");
-                        continue;
-                    }
-
                     if (i == 11)
                     {
                         // Orifice Properties
@@ -472,27 +1135,6 @@ namespace DPSGen
                         writer.WriteLine("#include \"OrificeFunctions.cginc\"");
                     }
 
-                    if (i == 174)
-                    {
-                        writer.WriteLine("#include \"UCTS_Outline_Orifice.cginc\"");
-                        continue;
-                    }
-                    if (i == 205)
-                    {
-                        writer.WriteLine("#include \"UCTS_DoubleShadeWithFeather_Orifice.cginc\"");
-                        continue;
-                    }
-                    if (i == 235)
-                    {
-                        writer.WriteLine("#include \"UCTS_DoubleShadeWithFeather_Orifice.cginc\"");
-                        continue;
-                    }
-                    if (i == 260)
-                    {
-                        writer.WriteLine("#include \"UCTS_ShadowCaster_Orifice.cginc\"");
-                        continue;
-                    }
-
                     writer.WriteLine(lines[i]);
                 }
                 writer.Flush();
@@ -506,14 +1148,13 @@ namespace DPSGen
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(pathToonDSF);
                 string[] xslines = File.ReadAllLines(pathXSPenetrator);
+                lines[5] = "Shader \"UnityChanToonShader/DPS/Toon_DoubleShadeWithFeather_Penetrator\" {";
+                lines[174] = "#include \"UCTS_Outline_Penetrator.cginc\"";
+                lines[205] = "#include \"UCTS_DoubleShadeWithFeather_Penetrator.cginc\"";
+                lines[235] = "#include \"UCTS_DoubleShadeWithFeather_Penetrator.cginc\"";
+                lines[260] = "#include \"UCTS_ShadowCaster_Penetrator.cginc\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (i == 5)
-                    {
-                        writer.WriteLine("Shader \"UnityChanToonShader/DPS/Toon_DoubleShadeWithFeather_Penetrator\" {");
-                        continue;
-                    }
-
                     if (i == 11)
                     {
                         // Penetrator Properties
@@ -528,27 +1169,6 @@ namespace DPSGen
                     {
                         writer.WriteLine("#include \"PenetratorDefines.cginc\"");
                         writer.WriteLine("#include \"PenetratorFunctions.cginc\"");
-                    }
-
-                    if (i == 174)
-                    {
-                        writer.WriteLine("#include \"UCTS_Outline_Penetrator.cginc\"");
-                        continue;
-                    }
-                    if (i == 205)
-                    {
-                        writer.WriteLine("#include \"UCTS_DoubleShadeWithFeather_Penetrator.cginc\"");
-                        continue;
-                    }
-                    if (i == 235)
-                    {
-                        writer.WriteLine("#include \"UCTS_DoubleShadeWithFeather_Penetrator.cginc\"");
-                        continue;
-                    }
-                    if (i == 260)
-                    {
-                        writer.WriteLine("#include \"UCTS_ShadowCaster_Penetrator.cginc\"");
-                        continue;
                     }
 
                     writer.WriteLine(lines[i]);
@@ -565,14 +1185,13 @@ namespace DPSGen
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(pathToonSGM);
                 string[] xslines = File.ReadAllLines(pathXSOrifice);
+                lines[5] = "Shader \"UnityChanToonShader/DPS/Toon_ShadingGradeMap_Orifice\" {";
+                lines[176] = "#include \"UCTS_Outline_Orifice.cginc\"";
+                lines[207] = "#include \"UCTS_ShadingGradeMap_Orifice.cginc\"";
+                lines[237] = "#include \"UCTS_ShadingGradeMap_Orifice.cginc\"";
+                lines[262] = "#include \"UCTS_ShadowCaster_Orifice.cginc\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (i == 5)
-                    {
-                        writer.WriteLine("Shader \"UnityChanToonShader/DPS/Toon_ShadingGradeMap_Orifice\" {");
-                        continue;
-                    }
-
                     if (i == 11)
                     {
                         // Orifice Properties
@@ -589,27 +1208,6 @@ namespace DPSGen
                         writer.WriteLine("#include \"OrificeFunctions.cginc\"");
                     }
 
-                    if (i == 176)
-                    {
-                        writer.WriteLine("#include \"UCTS_Outline_Orifice.cginc\"");
-                        continue;
-                    }
-                    if (i == 207)
-                    {
-                        writer.WriteLine("#include \"UCTS_ShadingGradeMap_Orifice.cginc\"");
-                        continue;
-                    }
-                    if (i == 237)
-                    {
-                        writer.WriteLine("#include \"UCTS_ShadingGradeMap_Orifice.cginc\"");
-                        continue;
-                    }
-                    if (i == 262)
-                    {
-                        writer.WriteLine("#include \"UCTS_ShadowCaster_Orifice.cginc\"");
-                        continue;
-                    }
-
                     writer.WriteLine(lines[i]);
                 }
                 writer.Flush();
@@ -623,14 +1221,13 @@ namespace DPSGen
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(pathToonSGM);
                 string[] xslines = File.ReadAllLines(pathXSPenetrator);
+                lines[5] = "Shader \"UnityChanToonShader/DPS/Toon_ShadingGradeMap_Penetrator\" {";
+                lines[176] = "#include \"UCTS_Outline_Penetrator.cginc\"";
+                lines[207] = "#include \"UCTS_ShadingGradeMap_Penetrator.cginc\"";
+                lines[237] = "#include \"UCTS_ShadingGradeMap_Penetrator.cginc\"";
+                lines[262] = "#include \"UCTS_ShadowCaster_Penetrator.cginc\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (i == 5)
-                    {
-                        writer.WriteLine("Shader \"UnityChanToonShader/DPS/Toon_ShadingGradeMap_Penetrator\" {");
-                        continue;
-                    }
-
                     if (i == 11)
                     {
                         // Penetrator Properties
@@ -645,27 +1242,6 @@ namespace DPSGen
                     {
                         writer.WriteLine("#include \"PenetratorDefines.cginc\"");
                         writer.WriteLine("#include \"PenetratorFunctions.cginc\"");
-                    }
-
-                    if (i == 176)
-                    {
-                        writer.WriteLine("#include \"UCTS_Outline_Penetrator.cginc\"");
-                        continue;
-                    }
-                    if (i == 207)
-                    {
-                        writer.WriteLine("#include \"UCTS_ShadingGradeMap_Penetrator.cginc\"");
-                        continue;
-                    }
-                    if (i == 237)
-                    {
-                        writer.WriteLine("#include \"UCTS_ShadingGradeMap_Penetrator.cginc\"");
-                        continue;
-                    }
-                    if (i == 262)
-                    {
-                        writer.WriteLine("#include \"UCTS_ShadowCaster_Penetrator.cginc\"");
-                        continue;
                     }
                     
                     writer.WriteLine(lines[i]);
@@ -682,37 +1258,18 @@ namespace DPSGen
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(pathToonColDSF);
                 string[] xslines = File.ReadAllLines(pathXSOrifice);
+                lines[5] = "Shader \"UnityChanToonShader/DPS/ToonColor_DoubleShadeWithFeather_Orifice\" {";
+                lines[139] = "UsePass \"UnityChanToonShader/DPS/Toon_DoubleShadeWithFeather_Orifice/FORWARD\"";
+                lines[140] = "UsePass \"UnityChanToonShader/DPS/Toon_DoubleShadeWithFeather_Orifice/FORWARD_DELTA\"";
+                lines[141] = "UsePass \"UnityChanToonShader/DPS/Toon_DoubleShadeWithFeather_Orifice/SHADOWCASTER\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (i == 5)
-                    {
-                        writer.WriteLine("Shader \"UnityChanToonShader/DPS/ToonColor_DoubleShadeWithFeather_Orifice\" {");
-                        continue;
-                    }
-
                     if (i == 11)
                     {
                         // Orifice Properties
                         for (int j = 12; j <= 23; j++)
                             writer.WriteLine(xslines[j]);
                     }
-
-                    if (i == 139)
-                    {
-                        writer.WriteLine("UsePass \"UnityChanToonShader/DPS/Toon_DoubleShadeWithFeather_Orifice/FORWARD\"");
-                        continue;
-                    }
-                    if (i == 140)
-                    {
-                        writer.WriteLine("UsePass \"UnityChanToonShader/DPS/Toon_DoubleShadeWithFeather_Orifice/FORWARD_DELTA\"");
-                        continue;
-                    }
-                    if (i == 141)
-                    {
-                        writer.WriteLine("UsePass \"UnityChanToonShader/DPS/Toon_DoubleShadeWithFeather_Orifice/SHADOWCASTER\"");
-                        continue;
-                    }
-
                     writer.WriteLine(lines[i]);
                 }
                 writer.Flush();
@@ -726,37 +1283,18 @@ namespace DPSGen
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(pathToonColDSF);
                 string[] xslines = File.ReadAllLines(pathXSPenetrator);
+                lines[5] = "Shader \"UnityChanToonShader/DPS/ToonColor_DoubleShadeWithFeather_Penetrator\" {";
+                lines[139] = "UsePass \"UnityChanToonShader/DPS/Toon_DoubleShadeWithFeather_Penetrator/FORWARD\"";
+                lines[140] = "UsePass \"UnityChanToonShader/DPS/Toon_DoubleShadeWithFeather_Penetrator/FORWARD_DELTA\"";
+                lines[141] = "UsePass \"UnityChanToonShader/DPS/Toon_DoubleShadeWithFeather_Penetrator/SHADOWCASTER\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (i == 5)
-                    {
-                        writer.WriteLine("Shader \"UnityChanToonShader/DPS/ToonColor_DoubleShadeWithFeather_Penetrator\" {");
-                        continue;
-                    }
-
                     if (i == 11)
                     {
                         // Penetrator Properties
                         for (int j = 11; j <= 23; j++)
                             writer.WriteLine(xslines[j]);
                     }
-
-                    if (i == 139)
-                    {
-                        writer.WriteLine("UsePass \"UnityChanToonShader/DPS/Toon_DoubleShadeWithFeather_Penetrator/FORWARD\"");
-                        continue;
-                    }
-                    if (i == 140)
-                    {
-                        writer.WriteLine("UsePass \"UnityChanToonShader/DPS/Toon_DoubleShadeWithFeather_Penetrator/FORWARD_DELTA\"");
-                        continue;
-                    }
-                    if (i == 141)
-                    {
-                        writer.WriteLine("UsePass \"UnityChanToonShader/DPS/Toon_DoubleShadeWithFeather_Penetrator/SHADOWCASTER\"");
-                        continue;
-                    }
-
                     writer.WriteLine(lines[i]);
                 }
                 writer.Flush();
@@ -771,37 +1309,18 @@ namespace DPSGen
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(pathToonColSGM);
                 string[] xslines = File.ReadAllLines(pathXSOrifice);
+                lines[5] = "Shader \"UnityChanToonShader/DPS/ToonColor_ShadingGradeMap_Orifice\" {";
+                lines[141] = "UsePass \"UnityChanToonShader/DPS/Toon_ShadingGradeMap_Orifice/FORWARD\"";
+                lines[142] = "UsePass \"UnityChanToonShader/DPS/Toon_ShadingGradeMap_Orifice/FORWARD_DELTA\"";
+                lines[143] = "UsePass \"UnityChanToonShader/DPS/Toon_ShadingGradeMap_Orifice/SHADOWCASTER\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (i == 5)
-                    {
-                        writer.WriteLine("Shader \"UnityChanToonShader/DPS/ToonColor_ShadingGradeMap_Orifice\" {");
-                        continue;
-                    }
-
                     if (i == 11)
                     {
                         // Orifice Properties
                         for (int j = 12; j <= 23; j++)
                             writer.WriteLine(xslines[j]);
                     }
-
-                    if (i == 141)
-                    {
-                        writer.WriteLine("UsePass \"UnityChanToonShader/DPS/Toon_ShadingGradeMap_Orifice/FORWARD\"");
-                        continue;
-                    }
-                    if (i == 142)
-                    {
-                        writer.WriteLine("UsePass \"UnityChanToonShader/DPS/Toon_ShadingGradeMap_Orifice/FORWARD_DELTA\"");
-                        continue;
-                    }
-                    if (i == 143)
-                    {
-                        writer.WriteLine("UsePass \"UnityChanToonShader/DPS/Toon_ShadingGradeMap_Orifice/SHADOWCASTER\"");
-                        continue;
-                    }
-
                     writer.WriteLine(lines[i]);
                 }
                 writer.Flush();
@@ -815,37 +1334,18 @@ namespace DPSGen
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(pathToonColSGM);
                 string[] xslines = File.ReadAllLines(pathXSPenetrator);
+                lines[5] = "Shader \"UnityChanToonShader/DPS/ToonColor_ShadingGradeMap_Penetrator\" {";
+                lines[141] = "UsePass \"UnityChanToonShader/DPS/Toon_ShadingGradeMap_Penetrator/FORWARD\"";
+                lines[142] = "UsePass \"UnityChanToonShader/DPS/Toon_ShadingGradeMap_Penetrator/FORWARD_DELTA\"";
+                lines[143] = "UsePass \"UnityChanToonShader/DPS/Toon_ShadingGradeMap_Penetrator/SHADOWCASTER\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (i == 5)
-                    {
-                        writer.WriteLine("Shader \"UnityChanToonShader/DPS/ToonColor_ShadingGradeMap_Penetrator\" {");
-                        continue;
-                    }
-
                     if (i == 11)
                     {
                         // Penetrator Properties
                         for (int j = 12; j <= 23; j++)
                             writer.WriteLine(xslines[j]);
                     }
-
-                    if (i == 141)
-                    {
-                        writer.WriteLine("UsePass \"UnityChanToonShader/DPS/Toon_ShadingGradeMap_Penetrator/FORWARD\"");
-                        continue;
-                    }
-                    if (i == 142)
-                    {
-                        writer.WriteLine("UsePass \"UnityChanToonShader/DPS/Toon_ShadingGradeMap_Penetrator/FORWARD_DELTA\"");
-                        continue;
-                    }
-                    if (i == 143)
-                    {
-                        writer.WriteLine("UsePass \"UnityChanToonShader/DPS/Toon_ShadingGradeMap_Penetrator/SHADOWCASTER\"");
-                        continue;
-                    }
-
                     writer.WriteLine(lines[i]);
                 }
                 writer.Flush();
