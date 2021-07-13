@@ -13,3 +13,9 @@ How to use:
 2. Import DPSShaderGenerator.unitypackage.
 3. Run the DPS Shader Generator at Tools > DPS Shader Generator > Generate UnlitWF Shaders.
 4. Push the Generate button.
+
+(For Censor Effect)
+1. Import Censor Effect and Dynamic Penetration System 1.2.1 to your Unity project.
+2. Import DPSShaderGenerator.unitypackage.
+3. Run the DPS Shader Generator at Tools > DPS Shader Generator > Generate CensorEffect Shaders.
+4. Push the Generate button.
