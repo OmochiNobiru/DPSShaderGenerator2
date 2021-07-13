@@ -202,6 +202,8 @@ namespace DPSGen
                         for (int j = 11; j <= 23; j++)
                             writer.WriteLine(xslines[j]);
                     }
+                    if (i == 9)
+                        writer.WriteLine("\"LightMode\" = \"ForwardBase\"");
                     if (i == 24)
                     {
                         writer.WriteLine("#include \"PenetratorDefines.cginc\"");
@@ -244,6 +246,8 @@ namespace DPSGen
                         for (int j = 11; j <= 23; j++)
                             writer.WriteLine(xslines[j]);
                     }
+                    if (i == 10)
+                        writer.WriteLine("\"LightMode\" = \"ForwardBase\"");
                     if (i == 25)
                     {
                         writer.WriteLine("#include \"PenetratorDefines.cginc\"");
@@ -286,6 +290,8 @@ namespace DPSGen
                         for (int j = 11; j <= 23; j++)
                             writer.WriteLine(xslines[j]);
                     }
+                    if (i == 10)
+                        writer.WriteLine("\"LightMode\" = \"ForwardBase\"");
                     if (i == 25)
                     {
                         writer.WriteLine("#include \"PenetratorDefines.cginc\"");
