@@ -73,6 +73,7 @@ namespace DPSGen
             string pathCensorMS = null;
             string pathXSOrifice = null;
             string pathXSPenetrator = null;
+            string pathOrifice = null;
             string[] guids1 = AssetDatabase.FindAssets("t:Shader");
             foreach (string guid in guids1)
             {
@@ -103,6 +104,11 @@ namespace DPSGen
                     pathXSPenetrator = sp;
                     log += "XSPenetrator: " + sp + "\n";
                 }
+                if (pathOrifice == null && sp.EndsWith("/Orifice.shader"))
+                {
+                    pathOrifice = sp;
+                    log += "Orifice: " + sp + "\n";
+                }
             }
 
             if (pathCensor == null || pathCensorMC == null || pathCensorMS == null)
@@ -110,7 +116,7 @@ namespace DPSGen
                 log += "Error: CensorEffect not found. Please import CensorEffect.";
                 return;
             }
-            if (pathXSOrifice == null || pathXSPenetrator == null)
+            if (pathXSOrifice == null || pathXSPenetrator == null || pathOrifice == null)
             {
                 log += "Error: DPS not found. Please import DPS.";
                 return;
@@ -154,6 +160,20 @@ namespace DPSGen
                 }
             }
 
+            string dpsPluginDirPath = Directory.GetParent(Path.GetDirectoryName(pathOrifice)) + "/Plugins";
+            string path_DPS_func = null;
+            log += "DPS_CGInc_Directory: " + dpsPluginDirPath + "\n";
+            string[] guids4 = AssetDatabase.FindAssets("", new string[] { dpsPluginDirPath });
+            foreach (string guid in guids4)
+            {
+                string sp = AssetDatabase.GUIDToAssetPath(guid);
+                if (path_DPS_func == null && sp.EndsWith("/RalivDPS_Functions.cginc"))
+                {
+                    path_DPS_func = sp;
+                    log += "DPSFunctions: " + sp + "\n";
+                }
+            }
+
             log += "\n";
             string[] selfguids = AssetDatabase.FindAssets("DPSShaderGenerator t:script");
             if (selfguids.Length == 0)
@@ -171,18 +191,21 @@ namespace DPSGen
             AssetDatabase.DeleteAsset(outputPath + "/PenetratorDefines.cginc");
             AssetDatabase.CopyAsset(path_xs_PD, outputPath + "/PenetratorDefines.cginc");
 
-            if (path_xs_VO != null)
+            if (path_DPS_func != null)
             {
                 string opath = outputPath + "/PenetratorFunctions.cginc";
                 AssetDatabase.DeleteAsset(opath);
                 StreamWriter writer = new StreamWriter(opath);
-                string[] lines = File.ReadAllLines(path_xs_VO);
-                for (int i = 0; i < 41; i++)
+                string[] lines = File.ReadAllLines(path_DPS_func);
+                for (int i = 0; i <= 41; i++)
+                    writer.WriteLine(lines[i]);
+                for (int i = 43; i <= 118; i++)
                     writer.WriteLine(lines[i]);
                 writer.Flush();
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
             }
+
 
             if (pathCensor != null)
             {
@@ -218,8 +241,7 @@ namespace DPSGen
                     if (i == 41)
                     {
                         // Penetrator vert
-                        for (int j = 43; j <= 106; j++)
-                            writer.WriteLine(vplines[j]);
+                        writer.WriteLine(vplines[119]);
                     }
                     writer.WriteLine(lines[i]);
                 }
@@ -262,8 +284,7 @@ namespace DPSGen
                     if (i == 45)
                     {
                         // Penetrator vert
-                        for (int j = 43; j <= 106; j++)
-                            writer.WriteLine(vplines[j]);
+                        writer.WriteLine(vplines[119]);
                     }
                     writer.WriteLine(lines[i]);
                 }
@@ -306,8 +327,7 @@ namespace DPSGen
                     if (i == 45)
                     {
                         // Penetrator vert
-                        for (int j = 43; j <= 106; j++)
-                            writer.WriteLine(vplines[j]);
+                        writer.WriteLine(vplines[119]);
                     }
                     writer.WriteLine(lines[i]);
                 }
@@ -373,6 +393,7 @@ namespace DPSGen
             string pathOutlineOnly = null;
             string pathXSOrifice = null;
             string pathXSPenetrator = null;
+            string pathOrifice = null;
             string[] guids1 = AssetDatabase.FindAssets("t:Shader");
             foreach (string guid in guids1)
             {
@@ -403,6 +424,11 @@ namespace DPSGen
                     pathXSPenetrator = sp;
                     log += "XSPenetrator: " + sp + "\n";
                 }
+                if (pathOrifice == null && sp.EndsWith("/Orifice.shader"))
+                {
+                    pathOrifice = sp;
+                    log += "Orifice: " + sp + "\n";
+                }
             }
 
             if (pathOpaque == null || pathOpaqueOutline == null || pathOutlineOnly == null)
@@ -410,7 +436,7 @@ namespace DPSGen
                 log += "Error: UnlitWF not found. Please import UnlitWF.";
                 return;
             }
-            if (pathXSOrifice == null || pathXSPenetrator == null)
+            if (pathXSOrifice == null || pathXSPenetrator == null || pathOrifice == null)
             {
                 log += "Error: DPS not found. Please import DPS.";
                 return;
@@ -520,12 +546,26 @@ namespace DPSGen
                 if (path_xs_VO == null && sp.EndsWith("/XSVertOrifice.cginc"))
                 {
                     path_xs_VO = sp;
-                    log += "DPSFunctions: " + sp + "\n";
+                    log += "XSVertOrifice: " + sp + "\n";
                 }
                 if (path_xs_VP == null && sp.EndsWith("/XSVert.cginc"))
                 {
                     path_xs_VP = sp;
                     log += "XSPenetratorVert: " + sp + "\n";
+                }
+            }
+
+            string dpsPluginDirPath = Directory.GetParent(Path.GetDirectoryName(pathOrifice)) + "/Plugins";
+            string path_DPS_func = null;
+            log += "DPS_CGInc_Directory: " + dpsPluginDirPath + "\n";
+            string[] guids4 = AssetDatabase.FindAssets("", new string[] { dpsPluginDirPath });
+            foreach (string guid in guids4)
+            {
+                string sp = AssetDatabase.GUIDToAssetPath(guid);
+                if (path_DPS_func == null && sp.EndsWith("/RalivDPS_Functions.cginc"))
+                {
+                    path_DPS_func = sp;
+                    log += "DPSFunctions: " + sp + "\n";
                 }
             }
 
@@ -567,6 +607,37 @@ namespace DPSGen
             AssetDatabase.DeleteAsset(outputPath + "/PenetratorDefines.cginc");
             AssetDatabase.CopyAsset(path_xs_PD, outputPath + "/PenetratorDefines.cginc");
 
+
+            if (path_DPS_func != null)
+            {
+                string opath = outputPath + "/OrificeFunctions.cginc";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(path_DPS_func);
+                for (int i = 0; i <= 41; i++)
+                    writer.WriteLine(lines[i]);
+                for (int i = 122; i <= 160; i++)
+                    writer.WriteLine(lines[i]);
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+            if (path_DPS_func != null)
+            {
+                string opath = outputPath + "/PenetratorFunctions.cginc";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(path_DPS_func);
+                for (int i = 0; i <= 41; i++)
+                    writer.WriteLine(lines[i]);
+                for (int i = 43; i <= 118; i++)
+                    writer.WriteLine(lines[i]);
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+
+
             if (path_inc_untoon != null)
             {
                 string opath = outputPath + "/WF_UnToon_Orifice.cginc";
@@ -586,8 +657,7 @@ namespace DPSGen
                     if (i == 78 || i == 203)
                     {
                         // Orifice vert
-                        for (int j = 54; j <= 81; j++)
-                            writer.WriteLine(xslines[j]);
+                        writer.WriteLine(xslines[86]);
                     }
                     writer.WriteLine(lines[i]);
                 }
@@ -613,8 +683,7 @@ namespace DPSGen
                     if (i == 78 || i == 203)
                     {
                         // Penetrator vert
-                        for (int j = 43; j <= 106; j++)
-                            writer.WriteLine(xslines[j]);
+                        writer.WriteLine(xslines[119]);
                     }
                     writer.WriteLine(lines[i]);
                 }
@@ -647,8 +716,7 @@ namespace DPSGen
                     if (i == 63)
                     {
                         // Orifice vert
-                        for (int j = 54; j <= 81; j++)
-                            writer.WriteLine(xslines[j]);
+                        writer.WriteLine(xslines[86]);
                     }
                     writer.WriteLine(lines[i]);
                 }
@@ -679,8 +747,7 @@ namespace DPSGen
                     if (i == 63)
                     {
                         // Penetrator vert
-                        for (int j = 43; j <= 106; j++)
-                            writer.WriteLine(xslines[j]);
+                        writer.WriteLine(xslines[119]);
                     }
                     writer.WriteLine(lines[i]);
                 }
@@ -718,8 +785,7 @@ namespace DPSGen
                     if (i == 48)
                     {
                         // Orifice vert
-                        for (int j = 54; j <= 81; j++)
-                            writer.WriteLine(xslines[j]);
+                        writer.WriteLine(xslines[86]);
                     }
                     writer.WriteLine(lines[i]);
                 }
@@ -756,8 +822,7 @@ namespace DPSGen
                     if (i == 48)
                     {
                         // Penetrator vert
-                        for (int j = 43; j <= 106; j++)
-                            writer.WriteLine(xslines[j]);
+                        writer.WriteLine(xslines[119]);
                     }
                     writer.WriteLine(lines[i]);
                 }
@@ -766,30 +831,6 @@ namespace DPSGen
                 log += "Generated: " + opath + "\n";
             }
 
-            if (path_xs_VO != null)
-            {
-                string opath = outputPath + "/OrificeFunctions.cginc";
-                AssetDatabase.DeleteAsset(opath);
-                StreamWriter writer = new StreamWriter(opath);
-                string[] lines = File.ReadAllLines(path_xs_VO);
-                for (int i = 0; i < 51; i++)
-                    writer.WriteLine(lines[i]);
-                writer.Flush();
-                newAssets.Add(opath);
-                log += "Generated: " + opath + "\n";
-            }
-            if (path_xs_VO != null)
-            {
-                string opath = outputPath + "/PenetratorFunctions.cginc";
-                AssetDatabase.DeleteAsset(opath);
-                StreamWriter writer = new StreamWriter(opath);
-                string[] lines = File.ReadAllLines(path_xs_VO);
-                for (int i = 0; i < 41; i++)
-                    writer.WriteLine(lines[i]);
-                writer.Flush();
-                newAssets.Add(opath);
-                log += "Generated: " + opath + "\n";
-            }
 
             if (pathOpaque != null)
             {
@@ -902,64 +943,7 @@ namespace DPSGen
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
             }
-/*
-            if (pathOutlineOnly != null)
-            {
-                string opath = outputPath + "/WF_UnToon_OutlineOnly_Opaque_Orifice.shader";
-                AssetDatabase.DeleteAsset(opath);
-                StreamWriter writer = new StreamWriter(opath);
-                string[] lines = File.ReadAllLines(pathOutlineOnly);
-                string[] xslines = File.ReadAllLines(pathXSOrifice);
-                lines[16] = "Shader \"UnlitWF/DPS/WF_UnToon_OutlineOnly_Opaque_Orifice\" {";
-                lines[96] = "#pragma vertex vert_outline";
-                lines[97] = "";
-                lines[101] = "";
-                lines[111] = "#include \"WF_UnToon_Orifice.cginc\"";
-                lines[121] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
-                for (int i = 0; i < lines.Length; i++)
-                {
-                    if (i == 27)
-                    {
-                        // Orifice Properties
-                        writer.WriteLine("[WFHeader(Orifice Dynamic Penetration System)]");
-                        for (int j = 12; j <= 23; j++)
-                            writer.WriteLine(xslines[j]);
-                    }
-                    writer.WriteLine(lines[i]);
-                }
-                writer.Flush();
-                newAssets.Add(opath);
-                log += "Generated: " + opath + "\n";
-            }
-            if (pathOutlineOnly != null)
-            {
-                string opath = outputPath + "/WF_UnToon_OutlineOnly_Opaque_Penetrator.shader";
-                AssetDatabase.DeleteAsset(opath);
-                StreamWriter writer = new StreamWriter(opath);
-                string[] lines = File.ReadAllLines(pathOutlineOnly);
-                string[] xslines = File.ReadAllLines(pathXSPenetrator);
-                lines[16] = "Shader \"UnlitWF/DPS/WF_UnToon_OutlineOnly_Opaque_Penetrator\" {";
-                lines[96] = "#pragma vertex vert_outline";
-                lines[97] = "";
-                lines[101] = "";
-                lines[111] = "#include \"WF_UnToon_Penetrator.cginc\"";
-                lines[121] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
-                for (int i = 0; i < lines.Length; i++)
-                {
-                    if (i == 27)
-                    {
-                        // Penetrator Properties
-                        writer.WriteLine("[WFHeader(Orifice Dynamic Penetration System)]");
-                        for (int j = 11; j <= 23; j++)
-                            writer.WriteLine(xslines[j]);
-                    }
-                    writer.WriteLine(lines[i]);
-                }
-                writer.Flush();
-                newAssets.Add(opath);
-                log += "Generated: " + opath + "\n";
-            }
-*/
+
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
@@ -970,8 +954,8 @@ namespace DPSGen
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(path_customEditor);
                 lines[28] = "public class ShaderCustomEditorDPS : ShaderGUI";
-                lines[208] = "";
-                for (int i = 0; i < 992; i++)
+                lines[227] = "";
+                for (int i = 0; i < 1095; i++)
                 {
                     writer.WriteLine(lines[i]);
                 }
@@ -1040,6 +1024,7 @@ namespace DPSGen
             string pathToonColSGM = null;
             string pathXSOrifice = null;
             string pathXSPenetrator = null;
+            string pathOrifice = null;
             string[] guids1 = AssetDatabase.FindAssets("t:Shader");
             foreach (string guid in guids1)
             {
@@ -1075,6 +1060,11 @@ namespace DPSGen
                     pathXSPenetrator = sp;
                     log += "XSPenetrator: " + sp + "\n";
                 }
+                if (pathOrifice == null && sp.EndsWith("/Orifice.shader"))
+                {
+                    pathOrifice = sp;
+                    log += "Orifice: " + sp + "\n";
+                }
             }
 
             if (pathToonDSF == null || pathToonSGM == null || pathToonColDSF == null || pathToonColSGM == null)
@@ -1082,7 +1072,7 @@ namespace DPSGen
                 log += "Error: UTS not found. Please import UTS.";
                 return;
             }
-            if (pathXSOrifice == null || pathXSPenetrator == null)
+            if (pathXSOrifice == null || pathXSPenetrator == null || pathOrifice == null)
             {
                 log += "Error: DPS not found. Please import DPS.";
                 return;
@@ -1149,12 +1139,26 @@ namespace DPSGen
                 if (path_xs_VO == null && sp.EndsWith("/XSVertOrifice.cginc"))
                 {
                     path_xs_VO = sp;
-                    log += "DPSFunctions: " + sp + "\n";
+                    log += "XSVertOrifice: " + sp + "\n";
                 }
                 if (path_xs_VP == null && sp.EndsWith("/XSVert.cginc"))
                 {
                     path_xs_VP = sp;
                     log += "XSPenetratorVert: " + sp + "\n";
+                }
+            }
+
+            string dpsPluginDirPath = Directory.GetParent(Path.GetDirectoryName(pathOrifice)) + "/Plugins";
+            string path_DPS_func = null;
+            log += "DPS_CGInc_Directory: " + dpsPluginDirPath + "\n";
+            string[] guids4 = AssetDatabase.FindAssets("", new string[] { dpsPluginDirPath });
+            foreach (string guid in guids4)
+            {
+                string sp = AssetDatabase.GUIDToAssetPath(guid);
+                if (path_DPS_func == null && sp.EndsWith("/RalivDPS_Functions.cginc"))
+                {
+                    path_DPS_func = sp;
+                    log += "DPSFunctions: " + sp + "\n";
                 }
             }
 
@@ -1172,25 +1176,29 @@ namespace DPSGen
 
             List<string> newAssets = new List<string>();
 
-            if (path_xs_VO != null)
+            if (path_DPS_func != null)
             {
                 string opath = outputPath + "/OrificeFunctions.cginc";
                 AssetDatabase.DeleteAsset(opath);
                 StreamWriter writer = new StreamWriter(opath);
-                string[] lines = File.ReadAllLines(path_xs_VO);
-                for (int i = 0; i < 51; i++)
+                string[] lines = File.ReadAllLines(path_DPS_func);
+                for (int i = 0; i <= 41; i++)
+                    writer.WriteLine(lines[i]);
+                for (int i = 122; i <= 160; i++)
                     writer.WriteLine(lines[i]);
                 writer.Flush();
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
             }
-            if (path_xs_VO != null)
+            if (path_DPS_func != null)
             {
                 string opath = outputPath + "/PenetratorFunctions.cginc";
                 AssetDatabase.DeleteAsset(opath);
                 StreamWriter writer = new StreamWriter(opath);
-                string[] lines = File.ReadAllLines(path_xs_VO);
-                for (int i = 0; i < 41; i++)
+                string[] lines = File.ReadAllLines(path_DPS_func);
+                for (int i = 0; i <= 41; i++)
+                    writer.WriteLine(lines[i]);
+                for (int i = 43; i <= 118; i++)
                     writer.WriteLine(lines[i]);
                 writer.Flush();
                 newAssets.Add(opath);
@@ -1215,8 +1223,7 @@ namespace DPSGen
                     if (i == 164)
                     {
                         // Orifice vert
-                        for (int j = 54; j <= 81; j++)
-                            writer.WriteLine(xslines[j]);
+                        writer.WriteLine(xslines[86]);
                     }
                     writer.WriteLine(lines[i]);
                 }
@@ -1236,8 +1243,7 @@ namespace DPSGen
                     if (i == 164)
                     {
                         // Penetrator vert
-                        for (int j = 43; j <= 106; j++)
-                            writer.WriteLine(xslines[j]);
+                        writer.WriteLine(xslines[119]);
                     }
                     writer.WriteLine(lines[i]);
                 }
@@ -1264,8 +1270,7 @@ namespace DPSGen
                     if (i == 194)
                     {
                         // Orifice vert
-                        for (int j = 54; j <= 81; j++)
-                            writer.WriteLine(xslines[j]);
+                        writer.WriteLine(xslines[86]);
                     }
                     writer.WriteLine(lines[i]);
                 }
@@ -1285,8 +1290,7 @@ namespace DPSGen
                     if (i == 194)
                     {
                         // Penetrator vert
-                        for (int j = 43; j <= 106; j++)
-                            writer.WriteLine(xslines[j]);
+                        writer.WriteLine(xslines[119]);
                     }
                     writer.WriteLine(lines[i]);
                 }
@@ -1313,8 +1317,7 @@ namespace DPSGen
                     if (i == 58)
                     {
                         // Orifice vert
-                        for (int j = 54; j <= 81; j++)
-                            writer.WriteLine(xslines[j]);
+                        writer.WriteLine(xslines[86]);
                     }
                     writer.WriteLine(lines[i]);
                 }
@@ -1334,8 +1337,7 @@ namespace DPSGen
                     if (i == 58)
                     {
                         // Penetrator vert
-                        for (int j = 43; j <= 106; j++)
-                            writer.WriteLine(xslines[j]);
+                        writer.WriteLine(xslines[119]);
                     }
                     writer.WriteLine(lines[i]);
                 }
@@ -1364,8 +1366,7 @@ namespace DPSGen
                     if (i == 48)
                     {
                         // Orifice vert
-                        for (int j = 54; j <= 81; j++)
-                            writer.WriteLine(xslines[j]);
+                        writer.WriteLine(xslines[86]);
                     }
                     writer.WriteLine(lines[i]);
                 }
@@ -1392,8 +1393,7 @@ namespace DPSGen
                     if (i == 48)
                     {
                         // Penetrator vert
-                        for (int j = 43; j <= 106; j++)
-                            writer.WriteLine(xslines[j]);
+                        writer.WriteLine(xslines[119]);
                     }
                     writer.WriteLine(lines[i]);
                 }
@@ -1416,10 +1416,10 @@ namespace DPSGen
                 string[] lines = File.ReadAllLines(pathToonDSF);
                 string[] xslines = File.ReadAllLines(pathXSOrifice);
                 lines[5] = "Shader \"UnityChanToonShader/DPS/Toon_DoubleShadeWithFeather_Orifice\" {";
-                lines[174] = "#include \"UCTS_Outline_Orifice.cginc\"";
-                lines[205] = "#include \"UCTS_DoubleShadeWithFeather_Orifice.cginc\"";
-                lines[235] = "#include \"UCTS_DoubleShadeWithFeather_Orifice.cginc\"";
-                lines[260] = "#include \"UCTS_ShadowCaster_Orifice.cginc\"";
+                lines[175] = "#include \"UCTS_Outline_Orifice.cginc\"";
+                lines[206] = "#include \"UCTS_DoubleShadeWithFeather_Orifice.cginc\"";
+                lines[236] = "#include \"UCTS_DoubleShadeWithFeather_Orifice.cginc\"";
+                lines[261] = "#include \"UCTS_ShadowCaster_Orifice.cginc\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
                     if (i == 11)
@@ -1428,9 +1428,6 @@ namespace DPSGen
                         for (int j = 12; j <= 23; j++)
                             writer.WriteLine(xslines[j]);
                     }
-
-                    if (i == 158)
-                        writer.WriteLine("\"LightMode\" = \"ForwardBase\"");
 
                     if (i == 170 || i == 199 || i == 232 || i == 259)
                     {
@@ -1452,10 +1449,10 @@ namespace DPSGen
                 string[] lines = File.ReadAllLines(pathToonDSF);
                 string[] xslines = File.ReadAllLines(pathXSPenetrator);
                 lines[5] = "Shader \"UnityChanToonShader/DPS/Toon_DoubleShadeWithFeather_Penetrator\" {";
-                lines[174] = "#include \"UCTS_Outline_Penetrator.cginc\"";
-                lines[205] = "#include \"UCTS_DoubleShadeWithFeather_Penetrator.cginc\"";
-                lines[235] = "#include \"UCTS_DoubleShadeWithFeather_Penetrator.cginc\"";
-                lines[260] = "#include \"UCTS_ShadowCaster_Penetrator.cginc\"";
+                lines[175] = "#include \"UCTS_Outline_Penetrator.cginc\"";
+                lines[206] = "#include \"UCTS_DoubleShadeWithFeather_Penetrator.cginc\"";
+                lines[236] = "#include \"UCTS_DoubleShadeWithFeather_Penetrator.cginc\"";
+                lines[261] = "#include \"UCTS_ShadowCaster_Penetrator.cginc\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
                     if (i == 11)
@@ -1464,9 +1461,6 @@ namespace DPSGen
                         for (int j = 11; j <= 23; j++)
                             writer.WriteLine(xslines[j]);
                     }
-
-                    if (i == 158)
-                        writer.WriteLine("\"LightMode\" = \"ForwardBase\"");
 
                     if (i == 170 || i == 199 || i == 232 || i == 259)
                     {
@@ -1489,10 +1483,10 @@ namespace DPSGen
                 string[] lines = File.ReadAllLines(pathToonSGM);
                 string[] xslines = File.ReadAllLines(pathXSOrifice);
                 lines[5] = "Shader \"UnityChanToonShader/DPS/Toon_ShadingGradeMap_Orifice\" {";
-                lines[176] = "#include \"UCTS_Outline_Orifice.cginc\"";
-                lines[207] = "#include \"UCTS_ShadingGradeMap_Orifice.cginc\"";
-                lines[237] = "#include \"UCTS_ShadingGradeMap_Orifice.cginc\"";
-                lines[262] = "#include \"UCTS_ShadowCaster_Orifice.cginc\"";
+                lines[177] = "#include \"UCTS_Outline_Orifice.cginc\"";
+                lines[208] = "#include \"UCTS_ShadingGradeMap_Orifice.cginc\"";
+                lines[238] = "#include \"UCTS_ShadingGradeMap_Orifice.cginc\"";
+                lines[263] = "#include \"UCTS_ShadowCaster_Orifice.cginc\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
                     if (i == 11)
@@ -1501,9 +1495,6 @@ namespace DPSGen
                         for (int j = 12; j <= 23; j++)
                             writer.WriteLine(xslines[j]);
                     }
-
-                    if (i == 160)
-                        writer.WriteLine("\"LightMode\" = \"ForwardBase\"");
 
                     if (i == 172 || i == 200 || i == 233 || i == 260)
                     {
@@ -1525,10 +1516,10 @@ namespace DPSGen
                 string[] lines = File.ReadAllLines(pathToonSGM);
                 string[] xslines = File.ReadAllLines(pathXSPenetrator);
                 lines[5] = "Shader \"UnityChanToonShader/DPS/Toon_ShadingGradeMap_Penetrator\" {";
-                lines[176] = "#include \"UCTS_Outline_Penetrator.cginc\"";
-                lines[207] = "#include \"UCTS_ShadingGradeMap_Penetrator.cginc\"";
-                lines[237] = "#include \"UCTS_ShadingGradeMap_Penetrator.cginc\"";
-                lines[262] = "#include \"UCTS_ShadowCaster_Penetrator.cginc\"";
+                lines[177] = "#include \"UCTS_Outline_Penetrator.cginc\"";
+                lines[208] = "#include \"UCTS_ShadingGradeMap_Penetrator.cginc\"";
+                lines[238] = "#include \"UCTS_ShadingGradeMap_Penetrator.cginc\"";
+                lines[263] = "#include \"UCTS_ShadowCaster_Penetrator.cginc\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
                     if (i == 11)
