@@ -66,6 +66,10 @@ namespace DPSGen
             string pathToonSGM = null;
             string pathToonColDSF = null;
             string pathToonColSGM = null;
+            string pathToonDSFTCP = null;
+            string pathToonSGMTCP = null;
+            string pathToonColDSFTR = null;
+            string pathToonColSGMTR = null;
             string pathXSOrifice = null;
             string pathXSPenetrator = null;
             string pathOrifice = null;
@@ -92,6 +96,26 @@ namespace DPSGen
                 {
                     pathToonColSGM = sp;
                     log += "ToonColSGM: " + sp + "\n";
+                }
+                if (pathToonDSFTCP == null && sp.EndsWith("/Toon_DoubleShadeWithFeather_TransClipping.shader"))
+                {
+                    pathToonDSFTCP = sp;
+                    log += "ToonDSFTCP: " + sp + "\n";
+                }
+                if (pathToonSGMTCP == null && sp.EndsWith("/Toon_ShadingGradeMap_TransClipping.shader"))
+                {
+                    pathToonSGMTCP = sp;
+                    log += "ToonSGMTCP: " + sp + "\n";
+                }
+                if (pathToonColDSFTR == null && sp.EndsWith("/ToonColor_DoubleShadeWithFeather_Transparent.shader"))
+                {
+                    pathToonColDSFTR = sp;
+                    log += "ToonColDSFTR: " + sp + "\n";
+                }
+                if (pathToonColSGMTR == null && sp.EndsWith("/ToonColor_ShadingGradeMap_Transparent.shader"))
+                {
+                    pathToonColSGMTR = sp;
+                    log += "ToonColSGMTR: " + sp + "\n";
                 }
 
                 if (pathXSOrifice == null && sp.EndsWith("/XSToon2.0 Orifice.shader"))
@@ -683,6 +707,450 @@ namespace DPSGen
                         // Penetrator Properties
                         for (int j = 12; j <= 23; j++)
                             writer.WriteLine(xslines[j]);
+                    }
+                    writer.WriteLine(lines[i]);
+                }
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+
+            if (pathToonColDSFTR != null)
+            {
+                string opath = outputPath + "/ToonColor_DoubleShadeWithFeather_Transparent_Orifice.shader";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(pathToonColDSFTR);
+                string[] xslines = File.ReadAllLines(pathXSOrifice);
+                lines[5] = "Shader \"UnityChanToonShader/DPS/ToonColor_DoubleShadeWithFeather_Transparent_Orifice\" {";
+                lines[165] = "Cull FRONT";
+                lines[186] = "#include \"UCTS_DoubleShadeWithFeather_Orifice.cginc\"";
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i == 11)
+                    {
+                        // Orifice Properties
+                        for (int j = 12; j <= 23; j++)
+                            writer.WriteLine(xslines[j]);
+                    }
+                    if (i >= 147 && i <= 151)
+                        continue;
+                    if (i == 180)
+                    {
+                        writer.WriteLine("#include \"OrificeDefines.cginc\"");
+                        writer.WriteLine("#include \"OrificeFunctions.cginc\"");
+                    }
+                    if (i == 191)
+                    {
+                        lines[155] = "Name \"FORWARD2\"";
+                        lines[161] = "Zwrite On";
+                        lines[165] = "Cull BACK";
+                        for (int j = 154; j <= 190; j++)
+                        {
+                            if (j == 180)
+                            {
+                                writer.WriteLine("#include \"OrificeDefines.cginc\"");
+                                writer.WriteLine("#include \"OrificeFunctions.cginc\"");
+                            }
+                            writer.WriteLine(lines[j]);
+                        }
+                    }
+                    writer.WriteLine(lines[i]);
+                }
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+            if (pathToonColDSFTR != null)
+            {
+                string opath = outputPath + "/ToonColor_DoubleShadeWithFeather_Transparent_Penetrator.shader";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(pathToonColDSFTR);
+                string[] xslines = File.ReadAllLines(pathXSPenetrator);
+                lines[5] = "Shader \"UnityChanToonShader/DPS/ToonColor_DoubleShadeWithFeather_Transparent_Penetrator\" {";
+                lines[165] = "Cull FRONT";
+                lines[186] = "#include \"UCTS_DoubleShadeWithFeather_Penetrator.cginc\"";
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i == 11)
+                    {
+                        // Penetrator Properties
+                        for (int j = 11; j <= 23; j++)
+                            writer.WriteLine(xslines[j]);
+                    }
+                    if (i >= 147 && i <= 151)
+                        continue;
+                    if (i == 180)
+                    {
+                        writer.WriteLine("#include \"PenetratorDefines.cginc\"");
+                        writer.WriteLine("#include \"PenetratorFunctions.cginc\"");
+                    }
+                    if (i == 191)
+                    {
+                        lines[155] = "Name \"FORWARD2\"";
+                        lines[161] = "Zwrite On";
+                        lines[165] = "Cull BACK";
+                        for (int j = 154; j <= 190; j++)
+                        {
+                            if (j == 180)
+                            {
+                                writer.WriteLine("#include \"PenetratorDefines.cginc\"");
+                                writer.WriteLine("#include \"PenetratorFunctions.cginc\"");
+                            }
+                            writer.WriteLine(lines[j]);
+                        }
+                    }
+                    writer.WriteLine(lines[i]);
+                }
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+
+            if (pathToonColSGMTR != null)
+            {
+                string opath = outputPath + "/ToonColor_ShadingGradeMap_Transparent_Orifice.shader";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(pathToonColSGMTR);
+                string[] xslines = File.ReadAllLines(pathXSOrifice);
+                lines[5] = "Shader \"UnityChanToonShader/DPS/ToonColor_ShadingGradeMap_Transparent_Orifice\" {";
+                lines[166] = "Cull FRONT";
+                lines[188] = "#include \"UCTS_ShadingGradeMap_Orifice.cginc\"";
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i == 11)
+                    {
+                        // Orifice Properties
+                        for (int j = 12; j <= 23; j++)
+                            writer.WriteLine(xslines[j]);
+                    }
+                    if (i >= 149 && i <= 153)
+                        continue;
+                    if (i == 180)
+                    {
+                        writer.WriteLine("#include \"OrificeDefines.cginc\"");
+                        writer.WriteLine("#include \"OrificeFunctions.cginc\"");
+                    }
+                    if (i == 194)
+                    {
+                        lines[157] = "Name \"FORWARD2\"";
+                        lines[162] = "Zwrite On";
+                        lines[166] = "Cull BACK";
+                        for (int j = 156; j <= 193; j++)
+                        {
+                            if (j == 180)
+                            {
+                                writer.WriteLine("#include \"OrificeDefines.cginc\"");
+                                writer.WriteLine("#include \"OrificeFunctions.cginc\"");
+                            }
+                            writer.WriteLine(lines[j]);
+                        }
+                    }
+                    writer.WriteLine(lines[i]);
+                }
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+            if (pathToonColSGMTR != null)
+            {
+                string opath = outputPath + "/ToonColor_ShadingGradeMap_Transparent_Penetrator.shader";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(pathToonColSGMTR);
+                string[] xslines = File.ReadAllLines(pathXSPenetrator);
+                lines[5] = "Shader \"UnityChanToonShader/DPS/ToonColor_ShadingGradeMap_Transparent_Penetrator\" {";
+                lines[166] = "Cull FRONT";
+                lines[188] = "#include \"UCTS_ShadingGradeMap_Penetrator.cginc\"";
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i == 11)
+                    {
+                        // Penetrator Properties
+                        for (int j = 12; j <= 23; j++)
+                            writer.WriteLine(xslines[j]);
+                    }
+                    if (i >= 149 && i <= 153)
+                        continue;
+                    if (i == 180)
+                    {
+                        writer.WriteLine("#include \"PenetratorDefines.cginc\"");
+                        writer.WriteLine("#include \"PenetratorFunctions.cginc\"");
+                    }
+                    if(i == 194)
+                    {
+                        lines[157] = "Name \"FORWARD2\"";
+                        lines[162] = "Zwrite On";
+                        lines[166] = "Cull BACK";
+                        for (int j = 156; j <= 193; j++)
+                        {
+                            if (j == 180)
+                            {
+                                writer.WriteLine("#include \"PenetratorDefines.cginc\"");
+                                writer.WriteLine("#include \"PenetratorFunctions.cginc\"");
+                            }
+                            writer.WriteLine(lines[j]);
+                        }
+                    }
+                    writer.WriteLine(lines[i]);
+                }
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+
+            if (pathToonDSFTCP != null)
+            {
+                string opath = outputPath + "/Toon_DoubleShadeWithFeather_TransClipping_Orifice.shader";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(pathToonDSFTCP);
+                string[] xslines = File.ReadAllLines(pathXSOrifice);
+                lines[5] = "Shader \"UnityChanToonShader/DPS/Toon_DoubleShadeWithFeather_TransClipping_Orifice\" {";
+                lines[159] = "\"Queue\"=\"Transparent\"";
+                lines[184] = "#include \"UCTS_Outline_Orifice.cginc\"";
+                lines[215] = "#include \"UCTS_DoubleShadeWithFeather_Orifice.cginc\"";
+                lines[244] = "#include \"UCTS_DoubleShadeWithFeather_Orifice.cginc\"";
+                lines[269] = "#include \"UCTS_ShadowCaster_Orifice.cginc\"";
+                lines[194] = "Cull FRONT";
+                lines[195] = "Zwrite Off";
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i == 11)
+                    {
+                        // Orifice Properties
+                        for (int j = 12; j <= 23; j++)
+                            writer.WriteLine(xslines[j]);
+                    }
+                    if (i >= 162 && i <= 186)
+                        continue;
+                    if (i == 208 || i == 240 || i == 267)
+                    {
+                        writer.WriteLine("#include \"OrificeDefines.cginc\"");
+                        writer.WriteLine("#include \"OrificeFunctions.cginc\"");
+                    }
+                    if (i == 219)
+                    {
+                        lines[189] = "Name \"FORWARD2\"";
+                        lines[194] = "Cull BACK";
+                        lines[195] = "Zwrite On";
+                        for (int j = 188; j <= 218; j++)
+                        {
+                            if (j == 208)
+                            {
+                                writer.WriteLine("#include \"OrificeDefines.cginc\"");
+                                writer.WriteLine("#include \"OrificeFunctions.cginc\"");
+                            }
+                            writer.WriteLine(lines[j]);
+                        }
+                    }
+                    if (i == 272)
+                    {
+                        lines[168] = "Zwrite On";
+                        for (int j = 162; j <= 186; j++)
+                        {
+                            if (j == 180)
+                            {
+                                writer.WriteLine("#include \"OrificeDefines.cginc\"");
+                                writer.WriteLine("#include \"OrificeFunctions.cginc\"");
+                            }
+                            writer.WriteLine(lines[j]);
+                        }
+                    }
+                    writer.WriteLine(lines[i]);
+                }
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+            if (pathToonDSFTCP != null)
+            {
+                string opath = outputPath + "/Toon_DoubleShadeWithFeather_TransClipping_Penetrator.shader";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(pathToonDSFTCP);
+                string[] xslines = File.ReadAllLines(pathXSPenetrator);
+                lines[5] = "Shader \"UnityChanToonShader/DPS/Toon_DoubleShadeWithFeather_TransClipping_Penetrator\" {";
+                lines[159] = "\"Queue\"=\"Transparent\"";
+                lines[184] = "#include \"UCTS_Outline_Penetrator.cginc\"";
+                lines[215] = "#include \"UCTS_DoubleShadeWithFeather_Penetrator.cginc\"";
+                lines[244] = "#include \"UCTS_DoubleShadeWithFeather_Penetrator.cginc\"";
+                lines[269] = "#include \"UCTS_ShadowCaster_Penetrator.cginc\"";
+                lines[194] = "Cull FRONT";
+                lines[195] = "Zwrite Off";
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i == 11)
+                    {
+                        // Penetrator Properties
+                        for (int j = 12; j <= 23; j++)
+                            writer.WriteLine(xslines[j]);
+                    }
+                    if (i >= 162 && i <= 186)
+                        continue;
+                    if (i == 208 || i == 240 || i == 267)
+                    {
+                        writer.WriteLine("#include \"PenetratorDefines.cginc\"");
+                        writer.WriteLine("#include \"PenetratorFunctions.cginc\"");
+                    }
+                    if (i == 219)
+                    {
+                        lines[189] = "Name \"FORWARD2\"";
+                        lines[194] = "Cull BACK";
+                        lines[195] = "Zwrite On";
+                        for (int j = 188; j <= 218; j++)
+                        {
+                            if (j == 208)
+                            {
+                                writer.WriteLine("#include \"PenetratorDefines.cginc\"");
+                                writer.WriteLine("#include \"PenetratorFunctions.cginc\"");
+                            }
+                            writer.WriteLine(lines[j]);
+                        }
+                    }
+                    if (i == 272)
+                    {
+                        lines[168] = "Zwrite On";
+                        for (int j = 162; j <= 186; j++)
+                        {
+                            if (j == 180)
+                            {
+                                writer.WriteLine("#include \"PenetratorDefines.cginc\"");
+                                writer.WriteLine("#include \"PenetratorFunctions.cginc\"");
+                            }
+                            writer.WriteLine(lines[j]);
+                        }
+                    }
+                    writer.WriteLine(lines[i]);
+                }
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+
+            if (pathToonSGMTCP != null)
+            {
+                string opath = outputPath + "/Toon_ShadingGradeMap_TransClipping_Orifice.shader";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(pathToonSGMTCP);
+                string[] xslines = File.ReadAllLines(pathXSOrifice);
+                lines[5] = "Shader \"UnityChanToonShader/DPS/Toon_ShadingGradeMap_TransClipping_Orifice\" {";
+                lines[161] = "\"Queue\"=\"Transparent\"";
+                lines[186] = "#include \"UCTS_Outline_Orifice.cginc\"";
+                lines[218] = "#include \"UCTS_ShadingGradeMap_Orifice.cginc\"";
+                lines[248] = "#include \"UCTS_ShadingGradeMap_Orifice.cginc\"";
+                lines[273] = "#include \"UCTS_ShadowCaster_Orifice.cginc\"";
+                lines[196] = "Cull FRONT";
+                lines[197] = "Zwrite Off";
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i == 11)
+                    {
+                        // Orifice Properties
+                        for (int j = 12; j <= 23; j++)
+                            writer.WriteLine(xslines[j]);
+                    }
+                    if (i >= 164 && i <= 188)
+                        continue;
+                    if (i == 210 || i == 243 || i == 271)
+                    {
+                        writer.WriteLine("#include \"OrificeDefines.cginc\"");
+                        writer.WriteLine("#include \"OrificeFunctions.cginc\"");
+                    }
+                    if (i == 222)
+                    {
+                        lines[191] = "Name \"FORWARD2\"";
+                        lines[196] = "Cull BACK";
+                        lines[197] = "Zwrite On";
+                        for (int j = 190; j <= 221; j++)
+                        {
+                            if (j == 210)
+                            {
+                                writer.WriteLine("#include \"OrificeDefines.cginc\"");
+                                writer.WriteLine("#include \"OrificeFunctions.cginc\"");
+                            }
+                            writer.WriteLine(lines[j]);
+                        }
+                    }
+                    if (i == 276)
+                    {
+                        lines[170] = "Zwrite On";
+                        for (int j = 164; j <= 188; j++)
+                        {
+                            if (j == 182)
+                            {
+                                writer.WriteLine("#include \"OrificeDefines.cginc\"");
+                                writer.WriteLine("#include \"OrificeFunctions.cginc\"");
+                            }
+                            writer.WriteLine(lines[j]);
+                        }
+                    }
+                    writer.WriteLine(lines[i]);
+                }
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+            if (pathToonSGMTCP != null)
+            {
+                string opath = outputPath + "/Toon_ShadingGradeMap_TransClipping_Penetrator.shader";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(pathToonSGMTCP);
+                string[] xslines = File.ReadAllLines(pathXSPenetrator);
+                lines[5] = "Shader \"UnityChanToonShader/DPS/Toon_ShadingGradeMap_TransClipping_Penetrator\" {";
+                lines[161] = "\"Queue\"=\"Transparent\"";
+                lines[186] = "#include \"UCTS_Outline_Penetrator.cginc\"";
+                lines[218] = "#include \"UCTS_ShadingGradeMap_Penetrator.cginc\"";
+                lines[248] = "#include \"UCTS_ShadingGradeMap_Penetrator.cginc\"";
+                lines[273] = "#include \"UCTS_ShadowCaster_Penetrator.cginc\"";
+                lines[196] = "Cull FRONT";
+                lines[197] = "Zwrite Off";
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i == 11)
+                    {
+                        // Penetrator Properties
+                        for (int j = 12; j <= 23; j++)
+                            writer.WriteLine(xslines[j]);
+                    }
+                    if (i >= 164 && i <= 188)
+                        continue;
+                    if (i == 210 || i == 243 || i == 271)
+                    {
+                        writer.WriteLine("#include \"PenetratorDefines.cginc\"");
+                        writer.WriteLine("#include \"PenetratorFunctions.cginc\"");
+                    }
+                    if (i == 222)
+                    {
+                        lines[191] = "Name \"FORWARD2\"";
+                        lines[196] = "Cull BACK";
+                        lines[197] = "Zwrite On";
+                        for (int j = 190; j <= 221; j++)
+                        {
+                            if (j == 210)
+                            {
+                                writer.WriteLine("#include \"PenetratorDefines.cginc\"");
+                                writer.WriteLine("#include \"PenetratorFunctions.cginc\"");
+                            }
+                            writer.WriteLine(lines[j]);
+                        }
+                    }
+                    if (i == 276)
+                    {
+                        lines[170] = "Zwrite On";
+                        for (int j = 164; j <= 188; j++)
+                        {
+                            if (j == 182)
+                            {
+                                writer.WriteLine("#include \"PenetratorDefines.cginc\"");
+                                writer.WriteLine("#include \"PenetratorFunctions.cginc\"");
+                            }
+                            writer.WriteLine(lines[j]);
+                        }
                     }
                     writer.WriteLine(lines[i]);
                 }

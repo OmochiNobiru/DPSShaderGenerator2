@@ -129,6 +129,7 @@ namespace DPSGen
             }
             
             string lilDirPath = Path.GetDirectoryName(pathLil) + "/Includes";
+            string path_forward = null;
             string path_normal = null;
             string path_shadow = null;
             string path_meta = null;
@@ -140,10 +141,15 @@ namespace DPSGen
             foreach (string guid in guids2)
             {
                 string sp = AssetDatabase.GUIDToAssetPath(guid);
-                if (path_normal == null && sp.EndsWith("/lil_pass_normal.hlsl"))
+                if (path_forward == null && sp.EndsWith("/lil_pass_forward.hlsl"))
+                {
+                    path_forward = sp;
+                    log += "path_forward: " + sp + "\n";
+                }
+                if (path_normal == null && sp.EndsWith("/lil_pass_forward_normal.hlsl"))
                 {
                     path_normal = sp;
-                    log += "pass_normal: " + sp + "\n";
+                    log += "pass_forward_normal: " + sp + "\n";
                 }
                 else if (path_shadow == null && sp.EndsWith("/lil_pass_shadowcaster.hlsl"))
                 {
@@ -158,17 +164,17 @@ namespace DPSGen
                 else if (path_common == null && sp.EndsWith("/lil_common.hlsl"))
                 {
                     path_common = sp;
-                    log += "normal_struct: " + sp + "\n";
+                    log += "lil_common: " + sp + "\n";
                 }
-                else if (path_struct == null && sp.EndsWith("/lil_normal_struct.hlsl"))
+                else if (path_struct == null && sp.EndsWith("/lil_common_appdata.hlsl"))
                 {
                     path_struct = sp;
-                    log += "normal_struct: " + sp + "\n";
+                    log += "lil_common_appdata: " + sp + "\n";
                 }
-                else if (path_vert == null && sp.EndsWith("/lil_normal_vertex.hlsl"))
+                else if (path_vert == null && sp.EndsWith("/lil_common_vert.hlsl"))
                 {
                     path_vert = sp;
-                    log += "normal_vertex: " + sp + "\n";
+                    log += "lil_common_vert: " + sp + "\n";
                 }
                 else
                 {
@@ -309,24 +315,18 @@ namespace DPSGen
 
             if (path_struct != null)
             {
-                string opath = outputPath + "/Includes" + "/lil_normal_struct.hlsl";
+                string opath = outputPath + "/Includes" + "/lil_common_appdata.hlsl";
                 AssetDatabase.DeleteAsset(opath);
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(path_struct);
                 string[] ovdlines = File.ReadAllLines(path_xs_OVD);
-                lines[108] = "";
-                lines[110] = "";
-                lines[111] = "";
-                lines[113] = "";
+                lines[46] = "";
+                lines[48] = "";
+                lines[50] = "";
+                lines[52] = "";
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (i == 43)
-                    {
-                        //add tangent and vertexId
-                        writer.WriteLine(lines[112]);
-                        writer.WriteLine(ovdlines[13]);
-                    }
-                    if (i == 120)
+                    if (i == 106)
                     {
                         //add vertexId
                         writer.WriteLine(ovdlines[13]);
@@ -356,7 +356,7 @@ namespace DPSGen
 
             if (path_vert != null)
             {
-                string opath = outputPath + "/Includes" + "/lil_normal_vertex_orifice.hlsl";
+                string opath = outputPath + "/Includes" + "/lil_common_vert_orifice.hlsl";
                 AssetDatabase.DeleteAsset(opath);
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(path_vert);
@@ -368,7 +368,7 @@ namespace DPSGen
                         writer.WriteLine("#include \"OrificeDefines.cginc\"");
                         writer.WriteLine("#include \"OrificeFunctions.cginc\"");
                     }
-                    if (i == 7)
+                    if (i == 52)
                     {
                         // Orifice vert
                         writer.WriteLine(orifice_vert);
@@ -381,7 +381,7 @@ namespace DPSGen
             }
             if (path_vert != null)
             {
-                string opath = outputPath + "/Includes" + "/lil_normal_vertex_penetrator.hlsl";
+                string opath = outputPath + "/Includes" + "/lil_common_vert_penetrator.hlsl";
                 AssetDatabase.DeleteAsset(opath);
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(path_vert);
@@ -393,7 +393,7 @@ namespace DPSGen
                         writer.WriteLine("#include \"PenetratorDefines.cginc\"");
                         writer.WriteLine("#include \"PenetratorFunctions.cginc\"");
                     }
-                    if (i == 7)
+                    if (i == 52)
                     {
                         // Penetrator vert
                         writer.WriteLine(penetrator_vert);
@@ -407,11 +407,11 @@ namespace DPSGen
 
             if (path_normal != null)
             {
-                string opath = outputPath + "/Includes" + "/lil_pass_normal_orifice.hlsl";
+                string opath = outputPath + "/Includes" + "/lil_pass_forward_normal_orifice.hlsl";
                 AssetDatabase.DeleteAsset(opath);
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(path_normal);
-                lines[8] = "#include \"Includes/lil_normal_vertex_orifice.hlsl\"";
+                lines[176] = "#include \"Includes/lil_common_vert_orifice.hlsl\"";
                 for (int i = 0; i < lines.Length; i++)
                     writer.WriteLine(lines[i]);
                 writer.Flush();
@@ -420,11 +420,38 @@ namespace DPSGen
             }
             if (path_normal != null)
             {
-                string opath = outputPath + "/Includes" + "/lil_pass_normal_penetrator.hlsl";
+                string opath = outputPath + "/Includes" + "/lil_pass_forward_normal_penetrator.hlsl";
                 AssetDatabase.DeleteAsset(opath);
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(path_normal);
-                lines[8] = "#include \"Includes/lil_normal_vertex_penetrator.hlsl\"";
+                lines[176] = "#include \"Includes/lil_common_vert_penetrator.hlsl\"";
+                for (int i = 0; i < lines.Length; i++)
+                    writer.WriteLine(lines[i]);
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+
+            if (path_forward != null)
+            {
+                string opath = outputPath + "/Includes" + "/lil_pass_forward_orifice.hlsl";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(path_forward);
+                lines[6] = "#include \"Includes/lil_pass_forward_normal_orifice.hlsl\"";
+                for (int i = 0; i < lines.Length; i++)
+                    writer.WriteLine(lines[i]);
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+            if (path_forward != null)
+            {
+                string opath = outputPath + "/Includes" + "/lil_pass_forward_penetrator.hlsl";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(path_forward);
+                lines[6] = "#include \"Includes/lil_pass_forward_normal_penetrator.hlsl\"";
                 for (int i = 0; i < lines.Length; i++)
                     writer.WriteLine(lines[i]);
                 writer.Flush();
@@ -438,26 +465,9 @@ namespace DPSGen
                 AssetDatabase.DeleteAsset(opath);
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(path_shadow);
-                string[] xslines = File.ReadAllLines(path_xs_VO);
-                string[] ovdlines = File.ReadAllLines(path_xs_OVD);
+                lines[36] = "#include \"Includes/lil_common_vert_orifice.hlsl\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (i == 4)
-                    {
-                        writer.WriteLine("#include \"OrificeDefines.cginc\"");
-                        writer.WriteLine("#include \"OrificeFunctions.cginc\"");
-                    }
-                    if (i == 18)
-                    {
-                        //add tangent and vertexId
-                        writer.WriteLine("float4 tangentOS    : TANGENT;");
-                        writer.WriteLine(ovdlines[13]);
-                    }
-                    if (i == 38)
-                    {
-                        // Orifice vert
-                        writer.WriteLine(orifice_vert);
-                    }
                     writer.WriteLine(lines[i]);
                 }
                 writer.Flush();
@@ -470,19 +480,9 @@ namespace DPSGen
                 AssetDatabase.DeleteAsset(opath);
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(path_shadow);
-                string[] xslines = File.ReadAllLines(path_xs_VP);
+                lines[36] = "#include \"Includes/lil_common_vert_penetrator.hlsl\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (i == 4)
-                    {
-                        writer.WriteLine("#include \"PenetratorDefines.cginc\"");
-                        writer.WriteLine("#include \"PenetratorFunctions.cginc\"");
-                    }
-                    if (i == 38)
-                    {
-                        // Penetrator vert
-                        writer.WriteLine(penetrator_vert);
-                    }
                     writer.WriteLine(lines[i]);
                 }
                 writer.Flush();
@@ -496,27 +496,9 @@ namespace DPSGen
                 AssetDatabase.DeleteAsset(opath);
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(path_meta);
-                string[] xslines = File.ReadAllLines(path_xs_VO);
-                string[] ovdlines = File.ReadAllLines(path_xs_OVD);
+                lines[45] = "#include \"Includes/lil_common_vert_orifice.hlsl\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (i == 5)
-                    {
-                        writer.WriteLine("#include \"OrificeDefines.cginc\"");
-                        writer.WriteLine("#include \"OrificeFunctions.cginc\"");
-                    }
-                    if (i == 11)
-                    {
-                        //add vertexId
-                        writer.WriteLine("float3 normalOS     : NORMAL;");
-                        writer.WriteLine("float4 tangentOS    : TANGENT;");
-                        writer.WriteLine(ovdlines[13]);
-                    }
-                    if (i == 34)
-                    {
-                        // Orifice vert
-                        writer.WriteLine(orifice_vert);
-                    }
                     writer.WriteLine(lines[i]);
                 }
                 writer.Flush();
@@ -529,24 +511,9 @@ namespace DPSGen
                 AssetDatabase.DeleteAsset(opath);
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(path_meta);
-                string[] xslines = File.ReadAllLines(path_xs_VP);
+                lines[45] = "#include \"Includes/lil_common_vert_penetrator.hlsl\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (i == 5)
-                    {
-                        writer.WriteLine("#include \"PenetratorDefines.cginc\"");
-                        writer.WriteLine("#include \"PenetratorFunctions.cginc\"");
-                    }
-                    if (i == 11)
-                    {
-                        //add normal
-                        writer.WriteLine("float3 normalOS     : NORMAL;");
-                    }
-                    if (i == 34)
-                    {
-                        // Penetrator vert
-                        writer.WriteLine(penetrator_vert);
-                    }
                     writer.WriteLine(lines[i]);
                 }
                 writer.Flush();
@@ -564,8 +531,8 @@ namespace DPSGen
                 lines[0] = "Shader \"Hidden/ltspass_opaque_orifice\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (lines[i].IndexOf("lil_pass_normal.hlsl") >= 0)
-                        lines[i] = lines[i].Replace("lil_pass_normal.hlsl", "lil_pass_normal_orifice.hlsl");
+                    if (lines[i].IndexOf("lil_pass_forward.hlsl") >= 0)
+                        lines[i] = lines[i].Replace("lil_pass_forward.hlsl", "lil_pass_forward_orifice.hlsl");
                     if (lines[i].IndexOf("lil_pass_shadowcaster.hlsl") >= 0)
                         lines[i] = lines[i].Replace("lil_pass_shadowcaster.hlsl", "lil_pass_shadowcaster_orifice.hlsl");
                     if (lines[i].IndexOf("lil_pass_meta.hlsl") >= 0)
@@ -587,8 +554,8 @@ namespace DPSGen
                 lines[0] = "Shader \"Hidden/ltspass_opaque_penetrator\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (lines[i].IndexOf("lil_pass_normal.hlsl") >= 0)
-                        lines[i] = lines[i].Replace("lil_pass_normal.hlsl", "lil_pass_normal_penetrator.hlsl");
+                    if (lines[i].IndexOf("lil_pass_forward.hlsl") >= 0)
+                        lines[i] = lines[i].Replace("lil_pass_forward.hlsl", "lil_pass_forward_penetrator.hlsl");
                     if (lines[i].IndexOf("lil_pass_shadowcaster.hlsl") >= 0)
                         lines[i] = lines[i].Replace("lil_pass_shadowcaster.hlsl", "lil_pass_shadowcaster_penetrator.hlsl");
                     if (lines[i].IndexOf("lil_pass_meta.hlsl") >= 0)
@@ -742,7 +709,7 @@ namespace DPSGen
                 lines[17] = "    public class lilToonInspectorDPS_Orifice : ShaderGUI";
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (i == 314)
+                    if (i == 381)
                     {
                         for (int j = 12; j <= 22; j++)
                         {
@@ -754,6 +721,14 @@ namespace DPSGen
                         }
                     }
 
+                    if (i == 909)
+                    {
+                        int stpos, edpos;
+                        stpos = xslines[12].IndexOf('(') + 1;
+                        edpos = xslines[12].IndexOf(',');
+                        string label = xslines[12].Substring(stpos, edpos - stpos);
+                        writer.WriteLine("GUIContent dpsod = new GUIContent(" + label + ");");
+                    }
                     if (i > 0 && lines[i - 1].IndexOf("materialEditor.ShaderProperty(invisible,") >= 0)
                     {
                         for (int j = 12; j <= 22; j++)
@@ -766,7 +741,10 @@ namespace DPSGen
                             stpos = xslines[j].IndexOf('(') + 1;
                             edpos = xslines[j].IndexOf(',');
                             string label = xslines[j].Substring(stpos, edpos - stpos);
-                            writer.WriteLine("materialEditor.ShaderProperty(" + prop_name + ", " + label + ");");
+                            if (j == 12)
+                                writer.WriteLine("materialEditor.TexturePropertySingleLine(dpsod, " + prop_name + ");");
+                            else
+                                writer.WriteLine("materialEditor.ShaderProperty(" + prop_name + ", " + label + ");");
                         }
                     }
 
@@ -809,7 +787,7 @@ namespace DPSGen
                 lines[17] = "    public class lilToonInspectorDPS_Penetrator : ShaderGUI";
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (i == 314)
+                    if (i == 381)
                     {
                         for (int j = 12; j <= 22; j++)
                         {
