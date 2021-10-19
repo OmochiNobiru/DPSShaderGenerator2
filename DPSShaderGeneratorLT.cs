@@ -580,9 +580,7 @@ namespace DPSGen
                 {
                     if (i == 13)
                     {
-                        // Orifice Properties
-                        writer.WriteLine("[lilToggle] " + xslines[12]);
-                        for (int j = 13; j <= 23; j++)
+                        for (int j = 12; j <= 23; j++)
                             writer.WriteLine(xslines[j]);
                     }
 
@@ -611,8 +609,7 @@ namespace DPSGen
                     if (i == 13)
                     {
                         // Penetrator Properties
-                        writer.WriteLine("[lilToggle] " + xslines[12]);
-                        for (int j = 13; j <= 23; j++)
+                        for (int j = 12; j <= 23; j++)
                             writer.WriteLine(xslines[j]);
                     }
 
@@ -642,8 +639,7 @@ namespace DPSGen
                     if (i == 13)
                     {
                         // Orifice Properties
-                        writer.WriteLine("[lilToggle] " + xslines[12]);
-                        for (int j = 13; j <= 23; j++)
+                        for (int j = 12; j <= 23; j++)
                             writer.WriteLine(xslines[j]);
                     }
 
@@ -672,8 +668,7 @@ namespace DPSGen
                     if (i == 13)
                     {
                         // Penetrator Properties
-                        writer.WriteLine("[lilToggle] " + xslines[12]);
-                        for (int j = 13; j <= 23; j++)
+                        for (int j = 12; j <= 23; j++)
                             writer.WriteLine(xslines[j]);
                     }
 
@@ -709,7 +704,7 @@ namespace DPSGen
                 lines[17] = "    public class lilToonInspectorDPS_Orifice : ShaderGUI";
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (i == 381)
+                    if (i == 387)
                     {
                         for (int j = 12; j <= 22; j++)
                         {
@@ -721,7 +716,7 @@ namespace DPSGen
                         }
                     }
 
-                    if (i == 909)
+                    if (i == 915)
                     {
                         int stpos, edpos;
                         stpos = xslines[12].IndexOf('(') + 1;
@@ -787,7 +782,7 @@ namespace DPSGen
                 lines[17] = "    public class lilToonInspectorDPS_Penetrator : ShaderGUI";
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (i == 381)
+                    if (i == 387)
                     {
                         for (int j = 12; j <= 22; j++)
                         {
