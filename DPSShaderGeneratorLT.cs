@@ -45,12 +45,17 @@ namespace DPSGen
             EditorGUILayout.Space();
 
             EditorGUILayout.LabelField("Generate DPS lilToon");
-            EditorGUILayout.HelpBox("You need to import DPS and lilToon before running this script.", MessageType.Info);
+            EditorGUILayout.HelpBox("You need to import DPS and lilToon 1.2.8 before running this script.", MessageType.Info);
             EditorGUILayout.Space();
 
             if (GUILayout.Button("Generate"))
             {
                 RunLILGen();
+            }
+
+            if (GUILayout.Button("Remove lilToonDPS"))
+            {
+                RemovelilToonDPS();
             }
 
             EditorGUILayout.Space();
@@ -78,13 +83,6 @@ namespace DPSGen
                 EditorUtility.ClearProgressBar();
                 return;
             }
-            string selfpath = AssetDatabase.GUIDToAssetPath(selfguids[0]);
-            string outputPath = Directory.GetParent(Path.GetDirectoryName(selfpath)) + "/lilToonDPS";
-            log += "OutputPath: " + outputPath + "\n";
-            Directory.CreateDirectory(outputPath);
-            Directory.CreateDirectory(outputPath + "/Includes");
-
-            EditorUtility.DisplayProgressBar($"Creating Output Path: ", outputPath, (float) curstep++ / totalstep);
 
             string pathLil = null;
             string pathLilOpaque = null;
@@ -133,6 +131,14 @@ namespace DPSGen
                     EditorUtility.DisplayProgressBar($"Found Orifice Shader: ", sp, (float) curstep++ / totalstep);
                 }
             }
+
+            string selfpath = Directory.GetParent(Path.GetDirectoryName(pathLil)) + "";
+            string outputPath = Directory.GetParent(selfpath) + "/lilToonDPS";
+            log += "OutputPath: " + outputPath + "\n";
+            Directory.CreateDirectory(outputPath);
+            Directory.CreateDirectory(outputPath + "/Includes");
+
+            EditorUtility.DisplayProgressBar($"Creating Output Path: ", outputPath, (float) curstep++ / totalstep);
 
             if (pathLil == null || pathLilOutline == null || pathLilOpaque == null)
             {
@@ -926,6 +932,48 @@ namespace DPSGen
             AssetDatabase.Refresh();
 
             EditorUtility.ClearProgressBar();
+
+            log += "Done.\n";
+        }
+
+        private void RemovelilToonDPS()
+        {
+
+            log = "";
+
+            AssetDatabase.StartAssetEditing();
+
+            string[] guids1 = AssetDatabase.FindAssets("t:Shader");
+            foreach (string guid in guids1)
+            {
+                string sp = AssetDatabase.GUIDToAssetPath(guid);
+                if (sp.EndsWith("/lts_o_penetrator.shader"))
+                {
+                    AssetDatabase.DeleteAsset(Directory.GetParent(sp) + "");
+                    log += "Removed: " + Directory.GetParent(sp) + "\n";
+                }
+            }
+
+
+            string[] guids2 = AssetDatabase.FindAssets("t:Script");
+            foreach (string guid in guids2)
+            {
+                string sp = AssetDatabase.GUIDToAssetPath(guid);
+                if (sp.EndsWith("/lilInspectorDPS_Orifice.cs"))
+                {
+                    AssetDatabase.DeleteAsset(sp);
+                    log += "Removed: " + sp + "\n";
+                }  
+                if (sp.EndsWith("/lilInspectorDPS_Penetrator.cs"))
+                {
+                    AssetDatabase.DeleteAsset(sp);
+                    log += "Removed: " + sp + "\n";
+                }
+            }
+
+            AssetDatabase.StopAssetEditing();
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
 
             log += "Done.\n";
         }
