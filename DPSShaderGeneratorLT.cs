@@ -265,8 +265,10 @@ namespace DPSGen
                 }
             }
 
+            AssetDatabase.StopAssetEditing();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
+            AssetDatabase.StartAssetEditing();
 
             List<string> newAssets = new List<string>();
 
@@ -691,8 +693,10 @@ namespace DPSGen
             AssetDatabase.DeleteAsset(outputPath + "/PenetratorDefines.cginc");
             AssetDatabase.CopyAsset(path_xs_PD, outputPath + "/PenetratorDefines.cginc");
 
+            AssetDatabase.StopAssetEditing();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
+            AssetDatabase.StartAssetEditing();
 
             if (path_customEditor != null)
             {
@@ -840,6 +844,7 @@ namespace DPSGen
                 log += "Generated: " + opath + "\n";
             }
 
+            AssetDatabase.StopAssetEditing();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
