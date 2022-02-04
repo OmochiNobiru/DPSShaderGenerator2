@@ -70,7 +70,7 @@ namespace DPSGen
                 return;
             }
             string selfpath = AssetDatabase.GUIDToAssetPath(selfguids[0]);
-            string outputPath = Directory.GetParent(Path.GetDirectoryName(selfpath)) + "/ShaderLIL";
+            string outputPath = Directory.GetParent(Path.GetDirectoryName(selfpath)) + "/lilToonDPS";
             log += "OutputPath: " + outputPath + "\n";
             Directory.CreateDirectory(outputPath);
             Directory.CreateDirectory(outputPath + "/Includes");
@@ -307,7 +307,7 @@ namespace DPSGen
                 AssetDatabase.DeleteAsset(opath);
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(path_common);
-                lines[4] = "#include \"Includes/lil_setting.hlsl\"";
+                lines[20] = "#include \"Includes/lil_setting.hlsl\"";
                 for (int i = 0; i < lines.Length; i++)
                     writer.WriteLine(lines[i]);
                 writer.Flush();
@@ -322,13 +322,13 @@ namespace DPSGen
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(path_struct);
                 string[] ovdlines = File.ReadAllLines(path_xs_OVD);
-                lines[46] = "";
                 lines[48] = "";
                 lines[50] = "";
                 lines[52] = "";
+                lines[54] = "";
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (i == 106)
+                    if (i == 115)
                     {
                         //add vertexId
                         writer.WriteLine(ovdlines[13]);
@@ -370,7 +370,7 @@ namespace DPSGen
                         writer.WriteLine("#include \"OrificeDefines.cginc\"");
                         writer.WriteLine("#include \"OrificeFunctions.cginc\"");
                     }
-                    if (i == 52)
+                    if (i == 54)
                     {
                         // Orifice vert
                         writer.WriteLine(orifice_vert);
@@ -395,7 +395,7 @@ namespace DPSGen
                         writer.WriteLine("#include \"PenetratorDefines.cginc\"");
                         writer.WriteLine("#include \"PenetratorFunctions.cginc\"");
                     }
-                    if (i == 52)
+                    if (i == 54)
                     {
                         // Penetrator vert
                         writer.WriteLine(penetrator_vert);
@@ -413,7 +413,7 @@ namespace DPSGen
                 AssetDatabase.DeleteAsset(opath);
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(path_normal);
-                lines[176] = "#include \"Includes/lil_common_vert_orifice.hlsl\"";
+                lines[108] = "#include \"Includes/lil_common_vert_orifice.hlsl\"";
                 for (int i = 0; i < lines.Length; i++)
                     writer.WriteLine(lines[i]);
                 writer.Flush();
@@ -426,7 +426,7 @@ namespace DPSGen
                 AssetDatabase.DeleteAsset(opath);
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(path_normal);
-                lines[176] = "#include \"Includes/lil_common_vert_penetrator.hlsl\"";
+                lines[108] = "#include \"Includes/lil_common_vert_penetrator.hlsl\"";
                 for (int i = 0; i < lines.Length; i++)
                     writer.WriteLine(lines[i]);
                 writer.Flush();
@@ -498,7 +498,7 @@ namespace DPSGen
                 AssetDatabase.DeleteAsset(opath);
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(path_meta);
-                lines[45] = "#include \"Includes/lil_common_vert_orifice.hlsl\"";
+                lines[47] = "#include \"Includes/lil_common_vert_orifice.hlsl\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
                     writer.WriteLine(lines[i]);
@@ -513,7 +513,7 @@ namespace DPSGen
                 AssetDatabase.DeleteAsset(opath);
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(path_meta);
-                lines[45] = "#include \"Includes/lil_common_vert_penetrator.hlsl\"";
+                lines[47] = "#include \"Includes/lil_common_vert_penetrator.hlsl\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
                     writer.WriteLine(lines[i]);
@@ -705,10 +705,10 @@ namespace DPSGen
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(path_customEditor);
                 string[] xslines = File.ReadAllLines(pathXSOrifice);
-                lines[17] = "    public class lilToonInspectorDPS_Orifice : ShaderGUI";
+                lines[14] = "    public class lilToonInspectorDPS_Orifice : ShaderGUI";
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (i == 387)
+                    if (i == 20)
                     {
                         for (int j = 12; j <= 22; j++)
                         {
@@ -720,7 +720,7 @@ namespace DPSGen
                         }
                     }
 
-                    if (i == 915)
+                    if (i == 36)
                     {
                         int stpos, edpos;
                         stpos = xslines[12].IndexOf('(') + 1;
@@ -728,7 +728,8 @@ namespace DPSGen
                         string label = xslines[12].Substring(stpos, edpos - stpos);
                         writer.WriteLine("GUIContent dpsod = new GUIContent(" + label + ");");
                     }
-                    if (i > 0 && lines[i - 1].IndexOf("materialEditor.ShaderProperty(invisible,") >= 0)
+
+                    if (i == 36)
                     {
                         for (int j = 12; j <= 22; j++)
                         {
@@ -747,7 +748,7 @@ namespace DPSGen
                         }
                     }
 
-                    if (i > 0 && lines[i - 1].IndexOf("invisible = FindProperty(") >= 0)
+                    if (i == 23)
                     {
                         for (int j = 12; j <= 22; j++)
                         {
@@ -758,6 +759,9 @@ namespace DPSGen
                             writer.WriteLine("dps" + prop_name + " = FindProperty(\"_" + prop_name + "\", props);");
                         }
                     }
+
+                    if (lines[i].IndexOf("isCustomShader  = material.shader.name.Contains") >= 0)
+                        lines[i] = lines[i].Replace("Optional", "Orifice");
 
                     if (lines[i].IndexOf("(lilPresetCategory)") >= 0)
                         lines[i] = lines[i].Replace("(lilPresetCategory)", "(lilToonInspector.lilPresetCategory)");
@@ -783,10 +787,10 @@ namespace DPSGen
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(path_customEditor);
                 string[] xslines = File.ReadAllLines(pathXSPenetrator);
-                lines[17] = "    public class lilToonInspectorDPS_Penetrator : ShaderGUI";
+                lines[14] = "    public class lilToonInspectorDPS_Penetrator : ShaderGUI";
                 for (int i = 0; i < lines.Length; i++)
                 {
-                    if (i == 387)
+                    if (i == 20)
                     {
                         for (int j = 12; j <= 22; j++)
                         {
@@ -798,7 +802,7 @@ namespace DPSGen
                         }
                     }
 
-                    if (i > 0 && lines[i - 1].IndexOf("materialEditor.ShaderProperty(invisible,") >= 0)
+                    if (i == 36)
                     {
                         for (int j = 12; j <= 22; j++)
                         {
@@ -814,7 +818,7 @@ namespace DPSGen
                         }
                     }
 
-                    if (i > 0 && lines[i - 1].IndexOf("invisible = FindProperty(") >= 0)
+                    if (i == 23)
                     {
                         for (int j = 12; j <= 22; j++)
                         {
@@ -825,6 +829,9 @@ namespace DPSGen
                             writer.WriteLine("dps" + prop_name + " = FindProperty(\"_" + prop_name + "\", props);");
                         }
                     }
+
+                    if (lines[i].IndexOf("isCustomShader  = material.shader.name.Contains") >= 0)
+                        lines[i] = lines[i].Replace("Optional", "Penetrator");
 
                     if (lines[i].IndexOf("(lilPresetCategory)") >= 0)
                         lines[i] = lines[i].Replace("(lilPresetCategory)", "(lilToonInspector.lilPresetCategory)");
