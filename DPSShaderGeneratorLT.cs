@@ -29,6 +29,8 @@ namespace DPSGen
 
         Vector2 scroll = Vector2.zero;
         string log = "";
+        int curstep = 0;
+        int totalstep = 46;
 
         private void OnEnable()
         {
@@ -63,10 +65,17 @@ namespace DPSGen
         {
             log = "";
 
+            AssetDatabase.StartAssetEditing();
+
             string[] selfguids = AssetDatabase.FindAssets("DPSShaderGenerator t:script");
             if (selfguids.Length == 0)
             {
                 log += "Error: Could not find this script from the asset database. Did you rename this script?";
+                EditorUtility.DisplayProgressBar($"Error: ", "Could not find this script from the asset database. Did you rename this script?", (float) curstep++ / totalstep);
+                AssetDatabase.StopAssetEditing();
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+                EditorUtility.ClearProgressBar();
                 return;
             }
             string selfpath = AssetDatabase.GUIDToAssetPath(selfguids[0]);
@@ -74,6 +83,8 @@ namespace DPSGen
             log += "OutputPath: " + outputPath + "\n";
             Directory.CreateDirectory(outputPath);
             Directory.CreateDirectory(outputPath + "/Includes");
+
+            EditorUtility.DisplayProgressBar($"Creating Output Path: ", outputPath, (float) curstep++ / totalstep);
 
             string pathLil = null;
             string pathLilOpaque = null;
@@ -89,42 +100,58 @@ namespace DPSGen
                 {
                     pathLil = sp;
                     log += "lil: " + sp + "\n";
+                    EditorUtility.DisplayProgressBar($"Found LilToon Shader: ", sp, (float) curstep++ / totalstep);
                 }
                 if (pathLilOutline == null && sp.EndsWith("/lts_o.shader"))
                 {
                     pathLilOutline = sp;
                     log += "lilOutline: " + sp + "\n";
+                    EditorUtility.DisplayProgressBar($"Found LilToon Outline Shader: ", sp, (float) curstep++ / totalstep);
                 }
                 if (pathLilOpaque == null && sp.EndsWith("/ltspass_opaque.shader"))
                 {
                     pathLilOpaque = sp;
                     log += "lilOpaque: " + sp + "\n";
+                    EditorUtility.DisplayProgressBar($"Found LilToon Opaque Shader: ", sp, (float) curstep++ / totalstep);
                 }
                 if (pathXSOrifice == null && sp.EndsWith("/XSToon2.0 Orifice.shader"))
                 {
                     pathXSOrifice = sp;
                     log += "XSOrifice: " + sp + "\n";
+                    EditorUtility.DisplayProgressBar($"Found XSOrifice Shader: ", sp, (float) curstep++ / totalstep);
                 }
                 if (pathXSPenetrator == null && sp.EndsWith("/XSToon2.0 Penetrator.shader"))
                 {
                     pathXSPenetrator = sp;
                     log += "XSPenetrator: " + sp + "\n";
+                    EditorUtility.DisplayProgressBar($"Found XSPenetrator Shader: ", sp, (float) curstep++ / totalstep);
                 }
                 if (pathOrifice == null && sp.EndsWith("/Orifice.shader"))
                 {
                     pathOrifice = sp;
                     log += "Orifice: " + sp + "\n";
+                    EditorUtility.DisplayProgressBar($"Found Orifice Shader: ", sp, (float) curstep++ / totalstep);
                 }
             }
 
             if (pathLil == null || pathLilOutline == null || pathLilOpaque == null)
             {
                 log += "Error: lilToon not found. Please import lilToon.";
+                EditorUtility.DisplayProgressBar($"Error: ", "lilToon not found. Please import lilToon.", (float) curstep++ / totalstep);
+                AssetDatabase.StopAssetEditing();
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+                EditorUtility.ClearProgressBar();
                 return;
             }
             if (pathXSOrifice == null || pathXSPenetrator == null || pathOrifice == null)
             {
                 log += "Error: DPS not found. Please import DPS.";
+                EditorUtility.DisplayProgressBar($"Error: ", "DPS not found. Please import DPS.", (float) curstep++ / totalstep);
+                AssetDatabase.StopAssetEditing();
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+                EditorUtility.ClearProgressBar();
                 return;
             }
             
@@ -145,36 +172,43 @@ namespace DPSGen
                 {
                     path_forward = sp;
                     log += "path_forward: " + sp + "\n";
+                    EditorUtility.DisplayProgressBar($"Found Liltoon Forward Pass: ", sp, (float) curstep++ / totalstep);
                 }
                 if (path_normal == null && sp.EndsWith("/lil_pass_forward_normal.hlsl"))
                 {
                     path_normal = sp;
                     log += "pass_forward_normal: " + sp + "\n";
+                    EditorUtility.DisplayProgressBar($"Found Liltoon Forward Normal Pass: ", sp, (float) curstep++ / totalstep);
                 }
                 else if (path_shadow == null && sp.EndsWith("/lil_pass_shadowcaster.hlsl"))
                 {
                     path_shadow = sp;
                     log += "pass_shadowcaster: " + sp + "\n";
+                    EditorUtility.DisplayProgressBar($"Found Liltoon Shadowcaster Pass: ", sp, (float) curstep++ / totalstep);
                 }
                 else if (path_meta == null && sp.EndsWith("/lil_pass_meta.hlsl"))
                 {
                     path_meta = sp;
                     log += "pass_meta: " + sp + "\n";
+                    EditorUtility.DisplayProgressBar($"Found Liltoon Meta Pass: ", sp, (float) curstep++ / totalstep);
                 }
                 else if (path_common == null && sp.EndsWith("/lil_common.hlsl"))
                 {
                     path_common = sp;
                     log += "lil_common: " + sp + "\n";
+                    EditorUtility.DisplayProgressBar($"Found Liltoon Common: ", sp, (float) curstep++ / totalstep);
                 }
                 else if (path_struct == null && sp.EndsWith("/lil_common_appdata.hlsl"))
                 {
                     path_struct = sp;
                     log += "lil_common_appdata: " + sp + "\n";
+                    EditorUtility.DisplayProgressBar($"Found Liltoon Common Appdata Pass: ", sp, (float) curstep++ / totalstep);
                 }
                 else if (path_vert == null && sp.EndsWith("/lil_common_vert.hlsl"))
                 {
                     path_vert = sp;
                     log += "lil_common_vert: " + sp + "\n";
+                    EditorUtility.DisplayProgressBar($"Found Liltoon Common Vert: ", sp, (float) curstep++ / totalstep);
                 }
                 else
                 {
@@ -194,6 +228,7 @@ namespace DPSGen
                 if (path_setting == null && sp.EndsWith("/lil_setting.hlsl"))
                 {
                     log += "lilSetting: " + sp + "\n";
+                    EditorUtility.DisplayProgressBar($"Found Liltoon Settings: ", sp, (float) curstep++ / totalstep);
                     string filename = Path.GetFileName(sp);
                     AssetDatabase.DeleteAsset(outputPath + "/Includes/" + filename);
                     AssetDatabase.CopyAsset(sp, outputPath + "/Includes/" + filename);
@@ -209,6 +244,7 @@ namespace DPSGen
                 {
                     path_customEditor = sp;
                     log += "CustomEditor: " + sp + "\n";
+                    EditorUtility.DisplayProgressBar($"Found Liltoon Inspector: ", sp, (float) curstep++ / totalstep);
                     break;
                 }
             }
@@ -228,26 +264,31 @@ namespace DPSGen
                 {
                     path_xs_OD = sp;
                     log += "OrificeDefines: " + sp + "\n";
+                    EditorUtility.DisplayProgressBar($"Found OrificeDefines: ", sp, (float) curstep++ / totalstep);
                 }
                 if (path_xs_PD == null && sp.EndsWith("/PenetratorDefines.cginc"))
                 {
                     path_xs_PD = sp;
                     log += "PenetratorDefines: " + sp + "\n";
+                    EditorUtility.DisplayProgressBar($"Found PenetratorDefines: ", sp, (float) curstep++ / totalstep);
                 }
                 if (path_xs_OVD == null && sp.EndsWith("/XSDefinesOrifice.cginc"))
                 {
                     path_xs_OVD = sp;
                     log += "DefinesOrificeVertexData: " + sp + "\n";
+                    EditorUtility.DisplayProgressBar($"Found DefinesOrificeVertexData: ", sp, (float) curstep++ / totalstep);
                 }
                 if (path_xs_VO == null && sp.EndsWith("/XSVertOrifice.cginc"))
                 {
                     path_xs_VO = sp;
                     log += "XSVertOrifice: " + sp + "\n";
+                    EditorUtility.DisplayProgressBar($"Found XSVertOrifice: ", sp, (float) curstep++ / totalstep);
                 }
                 if (path_xs_VP == null && sp.EndsWith("/XSVert.cginc"))
                 {
                     path_xs_VP = sp;
                     log += "XSPenetratorVert: " + sp + "\n";
+                    EditorUtility.DisplayProgressBar($"Found XSPenetratorVert: ", sp, (float) curstep++ / totalstep);
                 }
             }
 
@@ -262,8 +303,11 @@ namespace DPSGen
                 {
                     path_DPS_func = sp;
                     log += "DPSFunctions: " + sp + "\n";
+                    EditorUtility.DisplayProgressBar($"Found DPSFunctions: ", sp, (float) curstep++ / totalstep);
                 }
             }
+
+            EditorUtility.DisplayProgressBar($"Refreshing AssetDatabase", "1/3", (float) curstep++ / totalstep);
 
             AssetDatabase.StopAssetEditing();
             AssetDatabase.SaveAssets();
@@ -285,6 +329,7 @@ namespace DPSGen
                 writer.Flush();
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
+                EditorUtility.DisplayProgressBar($"Generated OrificeFunctions: ", opath, (float) curstep++ / totalstep);
             }
             if (path_DPS_func != null)
             {
@@ -299,6 +344,7 @@ namespace DPSGen
                 writer.Flush();
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
+                EditorUtility.DisplayProgressBar($"Generated PenetratorFunctions: ", opath, (float) curstep++ / totalstep);
             }
 
             if (path_common != null)
@@ -313,6 +359,7 @@ namespace DPSGen
                 writer.Flush();
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
+                EditorUtility.DisplayProgressBar($"Generated Common: ", opath, (float) curstep++ / totalstep);
             }
 
             if (path_struct != null)
@@ -338,6 +385,7 @@ namespace DPSGen
                 writer.Flush();
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
+                EditorUtility.DisplayProgressBar($"Generated Common Appdata: ", opath, (float) curstep++ / totalstep);
             }
 
             string orifice_vert = "";
@@ -380,6 +428,7 @@ namespace DPSGen
                 writer.Flush();
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
+                EditorUtility.DisplayProgressBar($"Generated Common Vert Orifice: ", opath, (float) curstep++ / totalstep);
             }
             if (path_vert != null)
             {
@@ -405,6 +454,7 @@ namespace DPSGen
                 writer.Flush();
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
+                EditorUtility.DisplayProgressBar($"Generated Common Vert Penetrator: ", opath, (float) curstep++ / totalstep);
             }
 
             if (path_normal != null)
@@ -419,6 +469,7 @@ namespace DPSGen
                 writer.Flush();
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
+                EditorUtility.DisplayProgressBar($"Generated Forward Normal Orifice Pass: ", opath, (float) curstep++ / totalstep);
             }
             if (path_normal != null)
             {
@@ -432,6 +483,7 @@ namespace DPSGen
                 writer.Flush();
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
+                EditorUtility.DisplayProgressBar($"Generated Forward Normal Penetrator Pass: ", opath, (float) curstep++ / totalstep);
             }
 
             if (path_forward != null)
@@ -446,6 +498,7 @@ namespace DPSGen
                 writer.Flush();
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
+                EditorUtility.DisplayProgressBar($"Generated Forward Orifice Pass: ", opath, (float) curstep++ / totalstep);
             }
             if (path_forward != null)
             {
@@ -459,6 +512,7 @@ namespace DPSGen
                 writer.Flush();
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
+                EditorUtility.DisplayProgressBar($"Generated Forward Penetrator Pass: ", opath, (float) curstep++ / totalstep);
             }
 
             if (path_shadow != null)
@@ -475,6 +529,7 @@ namespace DPSGen
                 writer.Flush();
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
+                EditorUtility.DisplayProgressBar($"Generated Shadowcaster Orifice Pass: ", opath, (float) curstep++ / totalstep);
             }
             if (path_shadow != null)
             {
@@ -490,6 +545,7 @@ namespace DPSGen
                 writer.Flush();
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
+                EditorUtility.DisplayProgressBar($"Generated Shadowcaster Penetrator Pass: ", opath, (float) curstep++ / totalstep);
             }
 
             if (path_meta != null)
@@ -506,6 +562,7 @@ namespace DPSGen
                 writer.Flush();
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
+                EditorUtility.DisplayProgressBar($"Generated Meta Orifice Pass: ", opath, (float) curstep++ / totalstep);
             }
             if (path_meta != null)
             {
@@ -521,6 +578,7 @@ namespace DPSGen
                 writer.Flush();
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
+                EditorUtility.DisplayProgressBar($"Generated Meta Penetrator Pass: ", opath, (float) curstep++ / totalstep);
             }
 
             if (pathLilOpaque != null)
@@ -545,6 +603,7 @@ namespace DPSGen
                 writer.Flush();
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
+                EditorUtility.DisplayProgressBar($"Generated Opaque Orifice Shader: ", opath, (float) curstep++ / totalstep);
             }
             if (pathLilOpaque != null)
             {
@@ -568,6 +627,7 @@ namespace DPSGen
                 writer.Flush();
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
+                EditorUtility.DisplayProgressBar($"Generated Opaque Penetrator Shader: ", opath, (float) curstep++ / totalstep);
             }
 
             if (pathLilOutline != null)
@@ -597,6 +657,7 @@ namespace DPSGen
                 writer.Flush();
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
+                EditorUtility.DisplayProgressBar($"Generated Orifice Outline Shader: ", opath, (float) curstep++ / totalstep);
             }
             if (pathLilOutline != null)
             {
@@ -626,6 +687,7 @@ namespace DPSGen
                 writer.Flush();
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
+                EditorUtility.DisplayProgressBar($"Generated Penetrator Outline Shader: ", opath, (float) curstep++ / totalstep);
             }
 
             if (pathLil != null)
@@ -656,6 +718,7 @@ namespace DPSGen
                 writer.Flush();
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
+                EditorUtility.DisplayProgressBar($"Generated Orifice Shader: ", opath, (float) curstep++ / totalstep);
             }
             if (pathLil != null)
             {
@@ -685,6 +748,7 @@ namespace DPSGen
                 writer.Flush();
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
+                EditorUtility.DisplayProgressBar($"Generated Penetrator Shader: ", opath, (float) curstep++ / totalstep);
             }
 
             AssetDatabase.DeleteAsset(outputPath + "/OrificeDefines.cginc");
@@ -692,6 +756,8 @@ namespace DPSGen
 
             AssetDatabase.DeleteAsset(outputPath + "/PenetratorDefines.cginc");
             AssetDatabase.CopyAsset(path_xs_PD, outputPath + "/PenetratorDefines.cginc");
+
+            EditorUtility.DisplayProgressBar($"Refreshing AssetDatabase", "2/3", (float) curstep++ / totalstep);
 
             AssetDatabase.StopAssetEditing();
             AssetDatabase.SaveAssets();
@@ -779,6 +845,7 @@ namespace DPSGen
                 writer.Close();
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
+                EditorUtility.DisplayProgressBar($"Generated Orifice Inspector: ", opath, (float) curstep++ / totalstep);
             }
             if (path_customEditor != null)
             {
@@ -849,11 +916,16 @@ namespace DPSGen
                 writer.Close();
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
+                EditorUtility.DisplayProgressBar($"Generated Penetrator Inspector: ", opath, (float) curstep++ / totalstep);
             }
+
+            EditorUtility.DisplayProgressBar($"Done!", "3/3", (float) curstep++ / totalstep);
 
             AssetDatabase.StopAssetEditing();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
+
+            EditorUtility.ClearProgressBar();
 
             log += "Done.\n";
         }
