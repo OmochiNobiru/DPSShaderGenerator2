@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 
 using System.Collections;
 using System.Collections.Generic;
@@ -360,6 +360,7 @@ namespace DPSGen
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(path_common);
                 // lines[20] = "#include \"Includes/lil_setting.hlsl\"";
+				//this does not seem to do anything anymore in latest LTS
                 for (int i = 0; i < lines.Length; i++)
                 {
                     if (lines[i].IndexOf("lilToonSetting/lil_setting.hlsl") >= 0)
@@ -648,6 +649,10 @@ namespace DPSGen
                     if (lines[i].IndexOf("lil_pass_meta.hlsl") >= 0)
                         lines[i] = lines[i].Replace("lil_pass_meta.hlsl", "lil_pass_meta_orifice.hlsl");
 
+					//only applies to newest LTS
+					if (lines[i].IndexOf("../../lilToonSetting/") >= 0)
+                        lines[i] = lines[i].Replace("../../lilToonSetting/", "Includes/");
+
                     writer.WriteLine(lines[i]);
                 }
                 writer.Flush();
@@ -671,6 +676,10 @@ namespace DPSGen
                         lines[i] = lines[i].Replace("lil_pass_shadowcaster.hlsl", "lil_pass_shadowcaster_penetrator.hlsl");
                     if (lines[i].IndexOf("lil_pass_meta.hlsl") >= 0)
                         lines[i] = lines[i].Replace("lil_pass_meta.hlsl", "lil_pass_meta_penetrator.hlsl");
+					
+					//only applies to newest LTS
+					if (lines[i].IndexOf("../../lilToonSetting/") >= 0)
+                        lines[i] = lines[i].Replace("../../lilToonSetting/", "Includes/");
 
                     writer.WriteLine(lines[i]);
                 }
