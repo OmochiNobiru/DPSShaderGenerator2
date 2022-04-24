@@ -566,6 +566,42 @@ namespace DPSGen
                 newAssets.Add(opath);
                 log += "Generated: " + opath + "\n";
             }
+            if (pathOpaque != null)
+            {
+                string opath = outputPath + "/Unlit_WF_UnToon_Opaque_Penetrator_Overlay.shader";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(pathOpaque);
+                string[] xslines = File.ReadAllLines(pathXSPenetrator);
+                lines[16] = "Shader \"UnlitWF/DPS/WF_UnToon_Opaque_Penetrator_Overlay\" {";
+                lines[291] = "\"RenderType\" = \"Transparent\"";
+                lines[292] = "\"Queue\" = \"Transparent+590\"";
+                lines[298] = "ZWrite ON";
+                lines[300] = "ZTest LEqual";
+                lines[326] = "#include \"WF_UnToon_Penetrator.cginc\"";
+                lines[345] = "#include \"WF_UnToon_ShadowCaster_Penetrator.cginc\"";
+                lines[334] = "ZWrite ON";
+                lines[336] = "ZTest LEqual";
+                lines[353] = "ZWrite ON";
+                lines[355] = "ZTest LEqual";
+                lines[365] = "#include \"WF_UnToon_Meta_Penetrator.cginc\"";
+                lines[373] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
+
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i == 29)
+                    {
+                        // Penetrator Properties
+                        writer.WriteLine("[WFHeader(Orifice Dynamic Penetration System)]");
+                        for (int j = 11; j <= 23; j++)
+                            writer.WriteLine(xslines[j]);
+                    }
+                    writer.WriteLine(lines[i]);
+                }
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
 
             if (pathOpaqueOutline != null)
             {
@@ -633,6 +669,38 @@ namespace DPSGen
                 string[] xslines = File.ReadAllLines(pathXSOrifice);
                 lines[16] = "Shader \"UnlitWF/DPS/WF_UnToon_Transparent_Orifice\" {";
                 lines[346] = "#include \"WF_UnToon_Orifice.cginc\"";
+                lines[386] = "#include \"WF_UnToon_Orifice.cginc\"";
+                lines[407] = "#include \"WF_UnToon_ShadowCaster_Orifice.cginc\"";
+                lines[429] = "#include \"WF_UnToon_Meta_Orifice.cginc\"";
+                lines[437] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (i == 26)
+                    {
+                        // Orifice Properties
+                        writer.WriteLine("[WFHeader(Orifice Dynamic Penetration System)]");
+                        for (int j = 12; j <= 23; j++)
+                            writer.WriteLine(xslines[j]);
+                    }
+                    writer.WriteLine(lines[i]);
+                }
+                writer.Flush();
+                newAssets.Add(opath);
+                log += "Generated: " + opath + "\n";
+            }
+            if (pathTransparent != null)
+            {
+                string opath = outputPath + "/Unlit_WF_UnToon_Transparent_Orifice_Overlay.shader";
+                AssetDatabase.DeleteAsset(opath);
+                StreamWriter writer = new StreamWriter(opath);
+                string[] lines = File.ReadAllLines(pathTransparent);
+                string[] xslines = File.ReadAllLines(pathXSOrifice);
+                lines[16] = "Shader \"UnlitWF/DPS/WF_UnToon_Transparent_Orifice_Overlay\" {";
+                lines[307] = "\"Queue\" = \"Transparent+580\"";
+                lines[315] = "ZTest Always";
+                lines[346] = "#include \"WF_UnToon_Orifice.cginc\"";
+                lines[356] = "ZWrite ON";
+                lines[358] = "ZTest Always";
                 lines[386] = "#include \"WF_UnToon_Orifice.cginc\"";
                 lines[407] = "#include \"WF_UnToon_ShadowCaster_Orifice.cginc\"";
                 lines[429] = "#include \"WF_UnToon_Meta_Orifice.cginc\"";
