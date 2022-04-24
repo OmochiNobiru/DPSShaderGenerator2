@@ -1,4 +1,4 @@
-﻿#if UNITY_EDITOR
+#if UNITY_EDITOR
 
 using System.Collections;
 using System.Collections.Generic;
@@ -360,6 +360,7 @@ namespace DPSGen
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(path_common);
                 // lines[20] = "#include \"Includes/lil_setting.hlsl\"";
+				//this does not seem to do anything anymore in latest LTS
                 for (int i = 0; i < lines.Length; i++)
                 {
                     if (lines[i].IndexOf("lilToonSetting/lil_setting.hlsl") >= 0)
@@ -648,6 +649,10 @@ namespace DPSGen
                     if (lines[i].IndexOf("lil_pass_meta.hlsl") >= 0)
                         lines[i] = lines[i].Replace("lil_pass_meta.hlsl", "lil_pass_meta_orifice.hlsl");
 
+					//only applies to newest LTS
+					if (lines[i].IndexOf("../../lilToonSetting/") >= 0)
+                        lines[i] = lines[i].Replace("../../lilToonSetting/", "Includes/");
+
                     writer.WriteLine(lines[i]);
                 }
                 writer.Flush();
@@ -671,6 +676,10 @@ namespace DPSGen
                         lines[i] = lines[i].Replace("lil_pass_shadowcaster.hlsl", "lil_pass_shadowcaster_penetrator.hlsl");
                     if (lines[i].IndexOf("lil_pass_meta.hlsl") >= 0)
                         lines[i] = lines[i].Replace("lil_pass_meta.hlsl", "lil_pass_meta_penetrator.hlsl");
+					
+					//only applies to newest LTS
+					if (lines[i].IndexOf("../../lilToonSetting/") >= 0)
+                        lines[i] = lines[i].Replace("../../lilToonSetting/", "Includes/");
 
                     writer.WriteLine(lines[i]);
                 }
@@ -833,6 +842,8 @@ namespace DPSGen
                     {
                         if (lines[i-1].IndexOf("isCustomShader = false;") >= 0)
                         {
+                            //to make the menu a foldout element we need this bool
+                            writer.WriteLine("private static bool isShowCustomProperties;");
                             for (int j = 12; j <= 22; j++)
                             {
                                 int stpos, edpos;
@@ -845,34 +856,40 @@ namespace DPSGen
 
                         if (lines[i-2].IndexOf("GUIStyle offsetButton)") >= 0)
                         {
+
+                            //this might be messy, writing code with code is uhhhh...
+                            //this will place our custom properties into a little drawer
+                            writer.WriteLine("isShowCustomProperties = Foldout(\"Dynamic Penetration System\", \"Oriface Properties\", isShowCustomProperties);");
+                            writer.WriteLine("DrawMenuButton(GetLoc(\"sOrifaceProperties\"), lilPropertyBlock.OrifaceDPS);");
+                            writer.WriteLine("if(isShowCustomProperties) {");
+
                             int stpos, edpos;
                             stpos = xslines[12].IndexOf('(') + 1;
                             edpos = xslines[12].IndexOf(',');
                             string label = xslines[12].Substring(stpos, edpos - stpos);
                             writer.WriteLine("GUIContent dpsod = new GUIContent(" + label + ");");
-                        }
 
-                        if (lines[i-2].IndexOf("GUIStyle offsetButton)") >= 0)
-                        {
                             for (int j = 12; j <= 22; j++)
                             {
-                                int stpos, edpos;
                                 stpos = xslines[j].IndexOf('_') + 1;
                                 edpos = xslines[j].IndexOf('(');
                                 string prop_name = "dps" + xslines[j].Substring(stpos, edpos - stpos);
 
                                 stpos = xslines[j].IndexOf('(') + 1;
                                 edpos = xslines[j].IndexOf(',');
-                                string label = xslines[j].Substring(stpos, edpos - stpos);
+                                label = xslines[j].Substring(stpos, edpos - stpos);
                                 if (j == 12)
                                     writer.WriteLine("materialEditor.TexturePropertySingleLine(dpsod, " + prop_name + ");");
                                 else
                                     writer.WriteLine("materialEditor.ShaderProperty(" + prop_name + ", " + label + ");");
                             }
+                            writer.WriteLine("}");
                         }
 
                         if (lines[i-2].IndexOf("void LoadCustomProperties") >= 0)
                         {
+                            //tell LTS this is a custom shader so it displays the Custom Properties GUI
+                            writer.WriteLine("isCustomShader = true;");
                             for (int j = 12; j <= 22; j++)
                             {
                                 int stpos, edpos;
@@ -884,9 +901,69 @@ namespace DPSGen
                         }
                     }
 
-                    if (lines[i].IndexOf("isCustomShader  = material.shader.name.Contains") >= 0)
-                        lines[i] = "            isCustomShader  = true;";
+                    if (i > 4) 
+                    {
+                        //Copy function
+                        if (lines[i-4].IndexOf("CopyProperties(lilPropertyBlock") >= 0)
+                        {
+                            writer.WriteLine("case lilPropertyBlock.OrifaceDPS:");
+                            for (int j = 12; j <= 22; j++)
+                            {
+                                int stpos, edpos;
+                                stpos = xslines[j].IndexOf('_') + 1;
+                                edpos = xslines[j].IndexOf('(');
+                                string prop_name = xslines[j].Substring(stpos, edpos - stpos);
+                                writer.WriteLine("CopyProperty(dps" + prop_name + ");");
+                            }
+                            writer.WriteLine("break;");
+                        }
 
+                        //Paste function
+                        if (lines[i-4].IndexOf("PasteProperties(lilPropertyBlock") >= 0)
+                        {
+                            writer.WriteLine("case lilPropertyBlock.OrifaceDPS:");
+                            for (int j = 12; j <= 22; j++)
+                            {
+                                int stpos, edpos;
+                                stpos = xslines[j].IndexOf('_') + 1;
+                                edpos = xslines[j].IndexOf('(');
+                                string prop_name = xslines[j].Substring(stpos, edpos - stpos);
+
+                                //special case for Paste (with texture)
+                                if(j == 12) {
+                                    writer.WriteLine("if(shouldCopyTex) {");
+                                    writer.WriteLine("PasteProperty(ref dps" + prop_name + ");");
+                                    writer.WriteLine("}");
+                                    continue;
+                                }
+
+                                writer.WriteLine("PasteProperty(ref dps" + prop_name + ");");
+                            }
+                            writer.WriteLine("break;");
+                        }
+
+                        //Reset function
+                        if (lines[i-4].IndexOf("ResetProperties(lilPropertyBlock") >= 0)
+                        {
+                            writer.WriteLine("case lilPropertyBlock.OrifaceDPS:");
+                            for (int j = 12; j <= 22; j++)
+                            {
+                                int stpos, edpos;
+                                stpos = xslines[j].IndexOf('_') + 1;
+                                edpos = xslines[j].IndexOf('(');
+                                string prop_name = xslines[j].Substring(stpos, edpos - stpos);
+                                writer.WriteLine("ResetProperty(ref dps" + prop_name + ");");
+                            }
+                            writer.WriteLine("break;");
+                        }
+                    }
+
+                    //add our custom property block to the list for copy, paste, and reset to work
+                    if (lines[i].IndexOf("Base,") >= 0)
+                        writer.WriteLine("OrifaceDPS,");
+
+                    // if (lines[i].IndexOf("isCustomShader  = material.shader.name.Contains") >= 0)
+                    //     lines[i] = "            isCustomShader  = true;";
                     if (lines[i].IndexOf("(lilPresetCategory)") >= 0)
                         lines[i] = lines[i].Replace("(lilPresetCategory)", "(lilToonInspector.lilPresetCategory)");
 
@@ -925,6 +1002,8 @@ namespace DPSGen
                     {
                         if (lines[i-1].IndexOf("isCustomShader = false;") >= 0)
                         {
+                            //to make the menu a foldout element we need this bool
+                            writer.WriteLine("private static bool isShowCustomProperties;");
                             for (int j = 12; j <= 22; j++)
                             {
                                 int stpos, edpos;
@@ -937,6 +1016,13 @@ namespace DPSGen
 
                         if (lines[i-2].IndexOf("GUIStyle offsetButton)") >= 0)
                         {
+
+                            //this might be messy, writing code with code is uhhhh...
+                            //this will place our custom properties into a little drawer
+                            writer.WriteLine("isShowCustomProperties = Foldout(\"Dynamic Penetration System\", \"Penetrator Properties\", isShowCustomProperties);");
+                            writer.WriteLine("DrawMenuButton(GetLoc(\"sPenetratorProperties\"), lilPropertyBlock.PenetratorDPS);");
+                            writer.WriteLine("if(isShowCustomProperties) {");
+
                             for (int j = 12; j <= 22; j++)
                             {
                                 int stpos, edpos;
@@ -949,10 +1035,13 @@ namespace DPSGen
                                 string label = xslines[j].Substring(stpos, edpos - stpos);
                                 writer.WriteLine("materialEditor.ShaderProperty(" + prop_name + ", " + label + ");");
                             }
+                            writer.WriteLine("}");
                         }
 
                         if (lines[i-2].IndexOf("void LoadCustomProperties") >= 0)
                         {
+                            //tell LTS this is a custom shader so it displays the Custom Properties GUI
+                            writer.WriteLine("isCustomShader = true;");
                             for (int j = 12; j <= 22; j++)
                             {
                                 int stpos, edpos;
@@ -964,9 +1053,60 @@ namespace DPSGen
                         }
                     }
 
-                    if (lines[i].IndexOf("isCustomShader  = material.shader.name.Contains") >= 0)
-                        lines[i] = "            isCustomShader  = true;";
+                    if (i > 4) 
+                    {
+                        //Copy function
+                        if (lines[i-4].IndexOf("CopyProperties(lilPropertyBlock") >= 0)
+                        {
+                            writer.WriteLine("case lilPropertyBlock.PenetratorDPS:");
+                            for (int j = 12; j <= 22; j++)
+                            {
+                                int stpos, edpos;
+                                stpos = xslines[j].IndexOf('_') + 1;
+                                edpos = xslines[j].IndexOf('(');
+                                string prop_name = xslines[j].Substring(stpos, edpos - stpos);
+                                writer.WriteLine("CopyProperty(dps" + prop_name + ");");
+                            }
+                            writer.WriteLine("break;");
+                        }
 
+                        //Paste function
+                        if (lines[i-4].IndexOf("PasteProperties(lilPropertyBlock") >= 0)
+                        {
+                            writer.WriteLine("case lilPropertyBlock.PenetratorDPS:");
+                            for (int j = 12; j <= 22; j++)
+                            {
+                                int stpos, edpos;
+                                stpos = xslines[j].IndexOf('_') + 1;
+                                edpos = xslines[j].IndexOf('(');
+                                string prop_name = xslines[j].Substring(stpos, edpos - stpos);
+                                writer.WriteLine("PasteProperty(ref dps" + prop_name + ");");
+                            }
+                            writer.WriteLine("break;");
+                        }
+
+                        //Reset function
+                        if (lines[i-4].IndexOf("ResetProperties(lilPropertyBlock") >= 0)
+                        {
+                            writer.WriteLine("case lilPropertyBlock.PenetratorDPS:");
+                            for (int j = 12; j <= 22; j++)
+                            {
+                                int stpos, edpos;
+                                stpos = xslines[j].IndexOf('_') + 1;
+                                edpos = xslines[j].IndexOf('(');
+                                string prop_name = xslines[j].Substring(stpos, edpos - stpos);
+                                writer.WriteLine("ResetProperty(ref dps" + prop_name + ");");
+                            }
+                            writer.WriteLine("break;");
+                        }
+                    }
+
+                    //add our custom property block to the list for copy, paste, and reset to work
+                    if (lines[i].IndexOf("Base,") >= 0)
+                        writer.WriteLine("PenetratorDPS,");
+
+                    // if (lines[i].IndexOf("isCustomShader  = material.shader.name.Contains") >= 0)
+                    //     lines[i] = "            isCustomShader  = true;";
                     if (lines[i].IndexOf("(lilPresetCategory)") >= 0)
                         lines[i] = lines[i].Replace("(lilPresetCategory)", "(lilToonInspector.lilPresetCategory)");
 
