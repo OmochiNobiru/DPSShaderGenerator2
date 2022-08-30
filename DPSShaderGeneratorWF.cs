@@ -334,7 +334,7 @@ namespace DPSGen
                         writer.WriteLine("#include \"OrificeDefines.cginc\"");
                     if (i == 72)
                         writer.WriteLine("#include \"OrificeFunctions.cginc\"");
-                    if (i == 78 || i == 203)
+                    if (i == 78 || i == 218)
                     {
                         // Orifice vert
                         writer.WriteLine(xslines[86]);
@@ -360,7 +360,7 @@ namespace DPSGen
                         writer.WriteLine("#include \"PenetratorDefines.cginc\"");
                     if (i == 72)
                         writer.WriteLine("#include \"PenetratorFunctions.cginc\"");
-                    if (i == 78 || i == 203)
+                    if (i == 78 || i == 218)
                     {
                         // Penetrator vert
                         writer.WriteLine(xslines[119]);
@@ -520,10 +520,10 @@ namespace DPSGen
                 string[] lines = File.ReadAllLines(pathOpaque);
                 string[] xslines = File.ReadAllLines(pathXSOrifice);
                 lines[16] = "Shader \"UnlitWF/DPS/WF_UnToon_Opaque_Orifice\" {";
-                lines[326] = "#include \"WF_UnToon_Orifice.cginc\"";
-                lines[345] = "#include \"WF_UnToon_ShadowCaster_Orifice.cginc\"";
-                lines[365] = "#include \"WF_UnToon_Meta_Orifice.cginc\"";
-                lines[373] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
+                lines[390] = "#include \"WF_UnToon_Orifice.cginc\"";
+                lines[410] = "#include \"WF_UnToon_ShadowCaster_Orifice.cginc\"";
+                lines[431] = "#include \"WF_UnToon_Meta_Orifice.cginc\"";
+                lines[439] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
                     if (i == 29)
@@ -547,10 +547,10 @@ namespace DPSGen
                 string[] lines = File.ReadAllLines(pathOpaque);
                 string[] xslines = File.ReadAllLines(pathXSPenetrator);
                 lines[16] = "Shader \"UnlitWF/DPS/WF_UnToon_Opaque_Penetrator\" {";
-                lines[326] = "#include \"WF_UnToon_Penetrator.cginc\"";
-                lines[345] = "#include \"WF_UnToon_ShadowCaster_Penetrator.cginc\"";
-                lines[365] = "#include \"WF_UnToon_Meta_Penetrator.cginc\"";
-                lines[373] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
+                lines[390] = "#include \"WF_UnToon_Penetrator.cginc\"";
+                lines[410] = "#include \"WF_UnToon_ShadowCaster_Penetrator.cginc\"";
+                lines[431] = "#include \"WF_UnToon_Meta_Penetrator.cginc\"";
+                lines[439] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
                     if (i == 29)
@@ -574,18 +574,18 @@ namespace DPSGen
                 string[] lines = File.ReadAllLines(pathOpaque);
                 string[] xslines = File.ReadAllLines(pathXSPenetrator);
                 lines[16] = "Shader \"UnlitWF/DPS/WF_UnToon_Opaque_Penetrator_Overlay\" {";
-                lines[291] = "\"RenderType\" = \"Transparent\"";
-                lines[292] = "\"Queue\" = \"Transparent+590\"";
-                lines[298] = "ZWrite ON";
-                lines[300] = "ZTest LEqual";
-                lines[326] = "#include \"WF_UnToon_Penetrator.cginc\"";
-                lines[345] = "#include \"WF_UnToon_ShadowCaster_Penetrator.cginc\"";
-                lines[334] = "ZWrite ON";
-                lines[336] = "ZTest LEqual";
-                lines[353] = "ZWrite ON";
-                lines[355] = "ZTest LEqual";
-                lines[365] = "#include \"WF_UnToon_Meta_Penetrator.cginc\"";
-                lines[373] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
+                lines[343] = "\"RenderType\" = \"Transparent\"";
+                lines[344] = "\"Queue\" = \"Transparent+590\"";
+                lines[351] = "ZWrite ON";
+                lines[353] = "ZTest LEqual";
+                lines[390] = "#include \"WF_UnToon_Penetrator.cginc\"";
+                lines[398] = "ZWrite ON";
+                lines[400] = "ZTest LEqual";
+                lines[410] = "#include \"WF_UnToon_ShadowCaster_Penetrator.cginc\"";
+                lines[418] = "ZWrite ON";
+                lines[420] = "ZTest LEqual";
+                lines[431] = "#include \"WF_UnToon_Meta_Penetrator.cginc\"";
+                lines[439] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
 
                 for (int i = 0; i < lines.Length; i++)
                 {
@@ -611,11 +611,11 @@ namespace DPSGen
                 string[] lines = File.ReadAllLines(pathOpaqueOutline);
                 string[] xslines = File.ReadAllLines(pathXSOrifice);
                 lines[16] = "Shader \"UnlitWF/DPS/WF_UnToon_Outline_Opaque_Orifice\" {";
-                lines[349] = "#include \"WF_UnToon_Orifice.cginc\"";
-                lines[386] = "#include \"WF_UnToon_Orifice.cginc\"";
-                lines[391] = "UsePass \"UnlitWF/DPS/WF_UnToon_Opaque_Orifice/SHADOWCASTER\"";
-                lines[392] = "UsePass \"UnlitWF/DPS/WF_UnToon_Opaque_Orifice/META\"";
-                lines[397] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
+                lines[406] = "#include \"WF_UnToon_Orifice.cginc\"";
+                lines[454] = "#include \"WF_UnToon_Orifice.cginc\"";
+                lines[459] = "UsePass \"UnlitWF/DPS/WF_UnToon_Opaque_Orifice/SHADOWCASTER\"";
+                lines[460] = "UsePass \"UnlitWF/DPS/WF_UnToon_Opaque_Orifice/META\"";
+                lines[465] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
                     if (i == 29)
@@ -639,11 +639,11 @@ namespace DPSGen
                 string[] lines = File.ReadAllLines(pathOpaqueOutline);
                 string[] xslines = File.ReadAllLines(pathXSPenetrator);
                 lines[16] = "Shader \"UnlitWF/DPS/WF_UnToon_Outline_Opaque_Penetrator\" {";
-                lines[349] = "#include \"WF_UnToon_Penetrator.cginc\"";
-                lines[386] = "#include \"WF_UnToon_Penetrator.cginc\"";
-                lines[391] = "UsePass \"UnlitWF/DPS/WF_UnToon_Opaque_Penetrator/SHADOWCASTER\"";
-                lines[392] = "UsePass \"UnlitWF/DPS/WF_UnToon_Opaque_Penetrator/META\"";
-                lines[397] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
+                lines[406] = "#include \"WF_UnToon_Penetrator.cginc\"";
+                lines[454] = "#include \"WF_UnToon_Penetrator.cginc\"";
+                lines[459] = "UsePass \"UnlitWF/DPS/WF_UnToon_Opaque_Penetrator/SHADOWCASTER\"";
+                lines[460] = "UsePass \"UnlitWF/DPS/WF_UnToon_Opaque_Penetrator/META\"";
+                lines[465] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
                     if (i == 29)
@@ -668,11 +668,11 @@ namespace DPSGen
                 string[] lines = File.ReadAllLines(pathTransparent);
                 string[] xslines = File.ReadAllLines(pathXSOrifice);
                 lines[16] = "Shader \"UnlitWF/DPS/WF_UnToon_Transparent_Orifice\" {";
-                lines[346] = "#include \"WF_UnToon_Orifice.cginc\"";
-                lines[386] = "#include \"WF_UnToon_Orifice.cginc\"";
-                lines[407] = "#include \"WF_UnToon_ShadowCaster_Orifice.cginc\"";
-                lines[429] = "#include \"WF_UnToon_Meta_Orifice.cginc\"";
-                lines[437] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
+                lines[414] = "#include \"WF_UnToon_Orifice.cginc\"";
+                lines[465] = "#include \"WF_UnToon_Orifice.cginc\"";
+                lines[487] = "#include \"WF_UnToon_ShadowCaster_Orifice.cginc\"";
+                lines[510] = "#include \"WF_UnToon_Meta_Orifice.cginc\"";
+                lines[518] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
                     if (i == 26)
@@ -696,15 +696,15 @@ namespace DPSGen
                 string[] lines = File.ReadAllLines(pathTransparent);
                 string[] xslines = File.ReadAllLines(pathXSOrifice);
                 lines[16] = "Shader \"UnlitWF/DPS/WF_UnToon_Transparent_Orifice_Overlay\" {";
-                lines[307] = "\"Queue\" = \"Transparent+580\"";
-                lines[315] = "ZTest Always";
-                lines[346] = "#include \"WF_UnToon_Orifice.cginc\"";
-                lines[356] = "ZWrite ON";
-                lines[358] = "ZTest Always";
-                lines[386] = "#include \"WF_UnToon_Orifice.cginc\"";
-                lines[407] = "#include \"WF_UnToon_ShadowCaster_Orifice.cginc\"";
-                lines[429] = "#include \"WF_UnToon_Meta_Orifice.cginc\"";
-                lines[437] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
+                lines[363] = "\"Queue\" = \"Transparent+580\"";
+                lines[370] = "ZTest Always";
+                lines[414] = "#include \"WF_UnToon_Orifice.cginc\"";
+                lines[424] = "ZWrite ON";
+                lines[426] = "ZTest Always";
+                lines[465] = "#include \"WF_UnToon_Orifice.cginc\"";
+                lines[487] = "#include \"WF_UnToon_ShadowCaster_Orifice.cginc\"";
+                lines[510] = "#include \"WF_UnToon_Meta_Orifice.cginc\"";
+                lines[518] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
                     if (i == 26)
@@ -728,11 +728,11 @@ namespace DPSGen
                 string[] lines = File.ReadAllLines(pathTransparent);
                 string[] xslines = File.ReadAllLines(pathXSPenetrator);
                 lines[16] = "Shader \"UnlitWF/DPS/WF_UnToon_Transparent_Penetrator\" {";
-                lines[346] = "#include \"WF_UnToon_Penetrator.cginc\"";
-                lines[386] = "#include \"WF_UnToon_Penetrator.cginc\"";
-                lines[407] = "#include \"WF_UnToon_ShadowCaster_Penetrator.cginc\"";
-                lines[429] = "#include \"WF_UnToon_Meta_Penetrator.cginc\"";
-                lines[437] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
+                lines[414] = "#include \"WF_UnToon_Penetrator.cginc\"";
+                lines[465] = "#include \"WF_UnToon_Penetrator.cginc\"";
+                lines[487] = "#include \"WF_UnToon_ShadowCaster_Penetrator.cginc\"";
+                lines[510] = "#include \"WF_UnToon_Meta_Penetrator.cginc\"";
+                lines[518] = "CustomEditor \"UnlitWF.ShaderCustomEditorDPS\"";
                 for (int i = 0; i < lines.Length; i++)
                 {
                     if (i == 26)
@@ -759,8 +759,8 @@ namespace DPSGen
                 StreamWriter writer = new StreamWriter(opath);
                 string[] lines = File.ReadAllLines(path_customEditor);
                 lines[28] = "public class ShaderCustomEditorDPS : ShaderGUI";
-                lines[227] = "";
-                for (int i = 0; i < 1095; i++)
+                lines[325] = "";
+                for (int i = 0; i < 1368; i++)
                 {
                     writer.WriteLine(lines[i]);
                 }
