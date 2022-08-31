@@ -36,8 +36,6 @@ namespace DPSGen
         int totalstep = 92;
         string template_path = "";
 
-        private static bool _isCompiling = false;
-
         private void OnEnable()
         {
             minSize = new Vector2(480, 640);
@@ -263,11 +261,11 @@ namespace DPSGen
                 }
             }
 
-            string[] guids_sc = AssetDatabase.FindAssets("", new string[] { "Assets/Template/Editor" });
+            string[] files2 = Directory.GetFiles(template_path + "/Editor");
             string path_custom_inspector = null;
-            foreach (string guid in guids_sc)
+            foreach (string fpath in files2)
             {
-                string sp = AssetDatabase.GUIDToAssetPath(guid);
+                string sp = fpath.Replace('\\', '/');
                 if (sp.EndsWith("/CustomInspector.cs"))
                 {
                     path_custom_inspector = sp;
