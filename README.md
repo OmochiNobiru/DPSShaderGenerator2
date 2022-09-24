@@ -17,7 +17,7 @@ How to use:
 
 (For lilToon)
 1. Download and unzip [the liltoon custom shader template](https://github.com/lilxyzw/lilToon/raw/Document/files/Template.zip).
-2. Import [lilToon 1.3.4](https://github.com/lilxyzw/lilToon/releases/download/1.3.3/lilToon_1.3.4.unitypackage) and [Dynamic Penetration System 1.3.1](https://raliv.booth.pm/items/2825903) to your Unity project.
+2. Import [lilToon](https://github.com/lilxyzw/lilToon/releases) and [Dynamic Penetration System 1.3.1](https://raliv.booth.pm/items/2825903) to your Unity project.
 3. Import DPSShaderGenerator.unitypackage.
 4. Run the DPS Shader Generator at Tools > DPS Shader Generator > Generate lilToon.
 5. Set the path to the liltoon custom shader template.
