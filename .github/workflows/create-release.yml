@@ -1,0 +1,44 @@
+name: create-release
+on:
+  push: 
+    tags:
+      - "v*"
+jobs:
+  build:
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      
+      - name: Branch name
+        id: branch_name
+        run: |
+          echo ::set-output name=SOURCE_NAME::${GITHUB_REF#refs/*/}
+          echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
+          echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+      
+      - name: Prepare Folder For Packaging
+        run: |
+          mkdir -p "Assets/DPSShaderGenerator"
+          ls | grep -v "Assets" | xargs -i{} mv {} "Assets/DPSShaderGenerator"
+          echo -e "fileFormatVersion: 2\nguid: 2693303a2bc044141b3a7d004d5cd6f0\nfolderAsset: yes\nDefaultImporter:\n  externalObjects: {}\n  userData: \n  assetBundleName: \n  assetBundleVariant: " > "Assets/DPSShaderGenerator.meta"
+          find "Assets/" -name \*.meta > package
+
+      - name: Create UnityPackage
+        env:
+          SOURCE_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
+        uses: pCYSl5EDgo/create-unitypackage@master
+        with:
+          package-path: 'DPSShaderGenerator_${{ env.SOURCE_TAG }}.unitypackage'
+          include-files: package
+          
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          name: "DPSShaderGenerator ${{ env.SOURCE_TAG }}"
+          files: |
+            Marker_${{ env.SOURCE_TAG }}.unitypackage
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SOURCE_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
