@@ -38,7 +38,7 @@ jobs:
         with:
           name: "DPSShaderGenerator ${{ env.SOURCE_TAG }}"
           files: |
-            Marker_${{ env.SOURCE_TAG }}.unitypackage
+            DPSShaderGenerator_${{ env.SOURCE_TAG }}.unitypackage
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SOURCE_TAG: ${{ steps.branch_name.outputs.SOURCE_TAG }}
