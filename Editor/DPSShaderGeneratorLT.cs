@@ -700,8 +700,8 @@ namespace DPSGen
             foreach (string sp in copy_files)
             {
                 string fname = Path.GetFileName(sp);
-                File.Copy(sp, lilOrificePath + "/Shaders/" + fname);
-                File.Copy(sp, lilPenetratorPath + "/Shaders/" + fname);
+                File.Copy(sp, lilOrificePath + "/Shaders/" + fname, true);
+                File.Copy(sp, lilPenetratorPath + "/Shaders/" + fname, true);
                 EditorUtility.DisplayProgressBar($"Copied ShaderContainers: ", fname, (float)curstep++ / totalstep);
             }
             AssetDatabase.StopAssetEditing();
