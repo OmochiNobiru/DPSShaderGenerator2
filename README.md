@@ -10,14 +10,14 @@ How to use:
 4. Push the Generate button.
 
 (For UnlitWF)
-1. Import [UnlitWF_20220813_01_Core_2019](https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/download/Unlit_WF_ShaderSuite_20220813/UnlitWF_20220813_01_Core_2019.unitypackage) and [Dynamic Penetration System 1.3.1](https://raliv.booth.pm/items/2825903) to your Unity project.
+1. Import [UnlitWF_20230107_01_Core_2019](https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/download/Unlit_WF_ShaderSuite_20230107/UnlitWF_20230107_01_Core_2019.unitypackage) and [Dynamic Penetration System 1.3.1](https://raliv.booth.pm/items/2825903) to your Unity project.
 2. Import DPSShaderGenerator.unitypackage.
 3. Run the DPS Shader Generator at Tools > DPS Shader Generator > Generate UnlitWF Shaders.
 4. Push the Generate button.
 
 (For lilToon)
 1. Download and unzip [the liltoon custom shader template](https://github.com/lilxyzw/lilToon/raw/Document/files/Template.zip).
-2. Import [lilToon](https://github.com/lilxyzw/lilToon/releases) and [Dynamic Penetration System 1.3.1](https://raliv.booth.pm/items/2825903) to your Unity project.
+2. Import [lilToon](https://github.com/lilxyzw/lilToon/releases/download/1.3.7/lilToon_1.3.7.unitypackage) and [Dynamic Penetration System 1.3.1](https://raliv.booth.pm/items/2825903) to your Unity project.
 3. Import DPSShaderGenerator.unitypackage.
 4. Run the DPS Shader Generator at Tools > DPS Shader Generator > Generate lilToon.
 5. Set the path to the liltoon custom shader template.
