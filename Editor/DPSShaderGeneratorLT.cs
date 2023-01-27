@@ -250,8 +250,8 @@ namespace DPSGen
                         log += "lilCustomShaderInsert: " + sp + "\n";
                         EditorUtility.DisplayProgressBar($"Found Liltoon lilCustomShaderInsert: ", sp, (float)curstep++ / totalstep);
                         string fname = Path.GetFileName(sp);
-                        File.Copy(sp, lilOrificePath + "/Shaders/" + fname);
-                        File.Copy(sp, lilPenetratorPath + "/Shaders/" + fname);
+                        File.Copy(sp, lilOrificePath + "/Shaders/" + fname, true);
+                        File.Copy(sp, lilPenetratorPath + "/Shaders/" + fname, true);
                     }
                 }
                 else
