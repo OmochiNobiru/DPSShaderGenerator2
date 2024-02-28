@@ -10,7 +10,7 @@ How to use:
 4. Push the Generate button.
 
 (For UnlitWF)
-1. Import [UnlitWF_20230107_01_Core_2019](https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/download/Unlit_WF_ShaderSuite_20230107/UnlitWF_20230107_01_Core_2019.unitypackage) and [Dynamic Penetration System 1.3.1](https://raliv.booth.pm/items/2825903) to your Unity project.
+1. Import [UnlitWF_20240212_01_Core_2019](https://github.com/whiteflare/Unlit_WF_ShaderSuite/releases/download/UnlitWF_Shader_20240212/UnlitWF_20240212_01_Core_2019.unitypackage) and [Dynamic Penetration System 1.3.1](https://raliv.booth.pm/items/2825903) to your Unity project.
 2. Import DPSShaderGenerator.unitypackage.
 3. Run the DPS Shader Generator at Tools > DPS Shader Generator > Generate UnlitWF Shaders.
 4. Push the Generate button.

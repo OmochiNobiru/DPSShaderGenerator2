@@ -274,13 +274,14 @@ namespace DPSGen
                 }
             }
 
-            string dpsCGincDirPath = Directory.GetParent(Path.GetDirectoryName(pathXSOrifice)) + "/CGInc";
+            string dpsCGincDirPath = Path.GetDirectoryName(Path.GetDirectoryName(pathXSOrifice)).Replace('\\', '/') + "/CGInc";
             string path_xs_OD = null;
             string path_xs_PD = null;
             string path_xs_OVD = null;
             string path_xs_VO = null;
             string path_xs_VP = null;
             log += "DPS_XS_CGInc_Directory: " + dpsCGincDirPath + "\n";
+
             string[] guids3 = AssetDatabase.FindAssets("", new string[] { dpsCGincDirPath });
             foreach (string guid in guids3)
             {
@@ -317,7 +318,7 @@ namespace DPSGen
                 }
             }
 
-            string dpsPluginDirPath = Directory.GetParent(Path.GetDirectoryName(pathOrifice)) + "/Plugins";
+            string dpsPluginDirPath = Path.GetDirectoryName(Path.GetDirectoryName(pathOrifice)).Replace('\\', '/') + "/Plugins";
             string path_DPS_func = null;
             log += "DPS_CGInc_Directory: " + dpsPluginDirPath + "\n";
             string[] guids4 = AssetDatabase.FindAssets("", new string[] { dpsPluginDirPath });
